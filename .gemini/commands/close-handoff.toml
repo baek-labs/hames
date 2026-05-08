@@ -1,0 +1,24 @@
+description = "완료된 핸드오프 파일을 _Archive로 이동 — close_handoff.ps1 실행"
+
+prompt = """
+사용자가 `/close-handoff` 슬래시 커맨드를 호출했습니다. 인자(handoff_id 또는 파일 경로): `{{args}}`
+
+## Step 1 — 파일 경로 결정
+- 인자가 파일 경로 형식이면 (`Handoff_*.md` 포함) 그대로 사용.
+- HandoffId만 전달된 경우: `ai_comm/_Inbox/Handoff_<id>.md` 로 변환.
+- 인자가 비어있으면: 먼저 다음 명령으로 `_Inbox` 파일 목록을 보여주고 사용자 선택을 요청:
+
+```bash
+!{ls ai_comm/_Inbox/ 2>&1}
+```
+
+## Step 2 — 아카이브 실행
+PowerShell:
+```powershell
+!{powershell -NoProfile -ExecutionPolicy Bypass -File arsenal/close_handoff.ps1 -HandoffFile "<resolved_path>"}
+```
+
+## Step 3 — 결과 보고
+- 성공: 이동된 경로(`_Archive/`) 출력.
+- 실패: 오류 메시지 명시 후 수동 확인 요청.
+"""

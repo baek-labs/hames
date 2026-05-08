@@ -1,0 +1,66 @@
+# {{WORKSPACE_NAME}} Workspace
+
+> Inherits from root [CLAUDE.md](../../CLAUDE.md)
+
+---
+
+## Workspace Identity
+
+- **WORKSPACE:** `{{WORKSPACE_NAME}}`
+- **PATH:** `workspaces/{{WORKSPACE_NAME}}`
+- **ROLE:** {{ONE_LINE_DESCRIPTION_OF_DOMAIN}}
+
+## Workspace Philosophy
+
+This workspace is not limited to one agent.
+All agent teams may be used here when useful.
+
+Typical combinations:
+
+- `{{WORKSPACE_NAME}} + CSO`
+- `{{WORKSPACE_NAME}} + CFO`
+- `{{WORKSPACE_NAME}} + CTO`
+- `{{WORKSPACE_NAME}} + Marketer`
+- `{{WORKSPACE_NAME}} + CBO`
+
+The workspace sets the domain context.
+The agent team sets the perspective.
+
+## Index-First Loading Order
+
+Before substantive work:
+
+1. read this file
+2. read `./_Master/`
+3. read `./_Index.md`
+4. only then load project-specific files
+
+## Core Rules
+
+- Final outputs should stay inside this workspace.
+- Existing files must be edited surgically.
+- Use `{YYYY}-{MM}-{DD}_{Keyword}.md` for dated outputs.
+- `*_MOC.md` files are not normal working outputs (Obsidian graph navigation only).
+
+## Critical Actions
+
+The following require explicit user approval before execution:
+
+`DELETE_FILE` / `OVERWRITE_EXISTING` / `SEND_EMAIL` / `DEPLOY_CODE` / `EXECUTE_SHELL` / `MOVE_FILE`
+
+## Default Loading Paths
+
+- `./_Master/`
+- `./_Index.md`
+- relevant subproject folders
+
+## Frontmatter Guide
+
+Adjust to your domain. Example schema:
+
+- `Related`: pointer to a Notion / Linear / external system reference
+- `Type`: project category (e.g. `Project_A`, `Initiative_X`)
+- `Topic`: doc category (e.g. `Strategy`, `Report`, `Spec`)
+- `tags`: free-form labels
+
+The frontmatter validation hook (`arsenal/verify_frontmatter_block.js`) reads `arsenal/audit_exclusions.json` `frontmatter_blocking` to determine which workspaces enforce required fields. Adjust both files together.

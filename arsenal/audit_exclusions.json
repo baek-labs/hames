@@ -1,0 +1,58 @@
+{
+  "schema_version": "exclusions-2026-05-08",
+  "_purpose": "manager.py 와 verify_tasks.js 가 공유하는 단일 예외 정의. 폴더 리네임/새 모드 문서/새 출력 폴더 발생 시 본 파일만 갱신.",
+
+  "content_audit_workspaces": [],
+
+  "inventory_index_workspaces": [],
+
+  "common_skip_dirs": [
+    "_Archive",
+    "_archive",
+    "_Master",
+    "node_modules",
+    ".next",
+    "dist",
+    "build",
+    "_vendor",
+    "output",
+    "outputs",
+    "cache",
+    ".turbo",
+    ".vercel",
+    ".cache"
+  ],
+
+  "meta_skip_filenames": [
+    "README.md",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "GEMINI.md",
+    "_Index.md",
+    "_template.md",
+    "HamesSystem_Public.md"
+  ],
+
+  "content_skip_dirs": [],
+
+  "duplicate_detection": {
+    "exclude_filenames": [
+      "README.md",
+      "CLAUDE.md",
+      "AGENTS.md",
+      "GEMINI.md",
+      "_Index.md",
+      "_template.md"
+    ],
+    "treat_date_prefix_series_as_single": true
+  },
+
+  "frontmatter_blocking": {
+    "_purpose": "verify_tasks PreToolUse blocking scope. Entry condition: path starts with one of workspace_prefixes AND filename is not in meta_skip_filenames AND path does not contain any common_skip_dirs/content_skip_dirs AND not in exempt_workspace_prefixes.",
+    "workspace_prefixes": [
+      "workspaces/"
+    ],
+    "exempt_workspace_prefixes": [],
+    "required_fields": ["Related", "Topic", "Type", "tags"]
+  }
+}

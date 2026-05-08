@@ -1,0 +1,192 @@
+{
+  "permissions": {
+    "allow": [
+      "Write(.claude/.workspace_lock)",
+
+      "Bash(ls *)",
+      "Bash(dir *)",
+      "Bash(grep:*)",
+      "Bash(curl:*)",
+      "Bash(read f:*)",
+      "Bash(start:*)",
+      "Bash(awk *)",
+      "Bash(xargs *)",
+      "Bash(sed *)",
+      "Bash(tr *)",
+      "Bash(printf *)",
+      "Bash(echo *)",
+      "Bash(wait)",
+      "Bash(sleep *)",
+      "Bash(md5sum *)",
+      "Bash(sha256sum *)",
+
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(py *)",
+      "Bash(pip install *)",
+      "Bash(pip *)",
+      "Bash(npm install:*)",
+      "Bash(npm install *)",
+      "Bash(npx serve:*)",
+      "Bash(npx tsc *)",
+      "Bash(powershell *)",
+      "PowerShell(*)",
+
+      "Bash(git *)",
+      "Bash(git filter-branch *)",
+      "Bash(git stash *)",
+      "Bash(git push *)",
+
+      "Bash(gh auth:*)",
+      "Bash(gh api:*)",
+      "Bash(gh --version)",
+      "Bash(gh *)",
+
+      "Bash(vercel *)",
+      "Bash(vercel ls:*)",
+      "Bash(vercel inspect:*)",
+      "Bash(vercel login:*)",
+      "Bash(vercel --version)",
+      "Bash(vercel --yes)",
+
+      "Bash(ffprobe *)",
+      "Bash(ffmpeg *)",
+      "Bash(yt-dlp *)",
+
+      "Bash(tasklist)",
+      "Bash(tasklist *)",
+      "Bash(taskkill /F /IM *)",
+      "Bash(taskkill /PID * /F)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Select-String *)",
+      "PowerShell(Get-Command *)",
+
+      "Bash(mkdir -p *)",
+      "Bash(rmdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(chmod +x *)",
+      "Bash(winget install:*)",
+
+      "Bash(node *compliance_auditor.js*)",
+      "Bash(node *google_tool.js*)",
+      "Bash(node *naver_blog_scraper.js*)",
+      "Bash(node *naver_keyword_tool.js*)",
+      "Bash(node *notion_tool.js*)",
+      "Bash(node *perplexity_tool.js*)",
+      "Bash(node *seo_report.js*)",
+      "Bash(node *session_logger.js*)",
+      "Bash(node *update_arsenal_permissions.js*)",
+      "Bash(node *verify_edit_surgery.js*)",
+      "Bash(node *verify_tasks.js*)",
+      "Bash(node *workspace_guard.js*)",
+
+      "Bash(python *hames_doctor.py*)",
+      "Bash(python *manager.py*)",
+      "Bash(python *openai_specialist.py*)",
+      "Bash(python *pdf_manager.py*)",
+      "Bash(python *ppt_manager.py*)",
+      "Bash(python *video_manager.py*)",
+
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:claude.com)",
+      "WebFetch(domain:openai.com)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_capture.js\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/context_verifier.js\"",
+            "statusMessage": "컨텍스트 시그니처 검증 중..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/workspace_guard.js\"",
+            "statusMessage": "워크스페이스 잠금 확인 중..."
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/arsenal/compliance_auditor.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/arsenal/verify_frontmatter_block.js\"",
+            "statusMessage": "Frontmatter 검증 중..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/arsenal/verify_edit_surgery.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/arsenal/verify_tasks.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/arsenal/update_arsenal_permissions.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/arsenal/session_logger.js\"",
+            "statusMessage": "세션 로그 기록 중..."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "hames-local",
+  "description": "Hames-local marketplace — Hames-aware forks of upstream Claude Code plugins.",
+  "owner": {
+    "name": "Hames",
+    "email": "{{CEO_EMAIL}}"
+  },
+  "plugins": [
+    {
+      "name": "claude-md-management-hames",
+      "description": "Hames-aware fork of claude-md-management. Audits and revises CLAUDE.md files while honoring the v5.3 kernel + .cursor/rules/* module separation, workspace boundaries, defense-line signatures, and isolated domains.",
+      "author": {
+        "name": "Hames"
+      },
+      "category": "productivity",
+      "source": "./plugins/claude-md-management-hames"
+    }
+  ]
+}

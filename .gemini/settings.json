@@ -1,0 +1,89 @@
+{
+  "_comment": "Gemini CLI hooks. Event names per Gemini docs: BeforeTool/AfterTool. 매처는 Gemini 도구명(write_file/replace/run_shell_command). hook_adapter가 Claude 형식으로 정규화.",
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "write_file|replace|run_shell_command|write_to_file|replace_file_content|multi_replace_file_content|run_command",
+        "hooks": [
+          {
+            "name": "context_verifier",
+            "type": "command",
+            "command": "node \"{{HAMES_ROOT_POSIX}}/.claude/hooks/hook_adapter.js\" \"{{HAMES_ROOT_POSIX}}/.claude/hooks/context_verifier.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "write_file|replace|run_shell_command|write_to_file|replace_file_content|multi_replace_file_content|run_command",
+        "hooks": [
+          {
+            "name": "workspace_guard",
+            "type": "command",
+            "command": "node \"{{HAMES_ROOT_POSIX}}/.claude/hooks/hook_adapter.js\" \"{{HAMES_ROOT_POSIX}}/.claude/hooks/workspace_guard.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "write_file|replace|run_shell_command|write_to_file|replace_file_content|multi_replace_file_content|run_command",
+        "hooks": [
+          {
+            "name": "compliance_auditor",
+            "type": "command",
+            "command": "node \"{{HAMES_ROOT_POSIX}}/.claude/hooks/hook_adapter.js\" \"{{HAMES_ROOT_POSIX}}/arsenal/compliance_auditor.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "write_file|write_to_file",
+        "hooks": [
+          {
+            "name": "verify_frontmatter_block",
+            "type": "command",
+            "command": "node \"{{HAMES_ROOT_POSIX}}/.claude/hooks/hook_adapter.js\" \"{{HAMES_ROOT_POSIX}}/arsenal/verify_frontmatter_block.js\""
+          }
+        ]
+      }
+    ],
+    "AfterTool": [
+      {
+        "matcher": "replace|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "name": "verify_edit_surgery",
+            "type": "command",
+            "command": "node \"{{HAMES_ROOT_POSIX}}/.claude/hooks/hook_adapter.js\" \"{{HAMES_ROOT_POSIX}}/arsenal/verify_edit_surgery.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "write_file|replace|write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "name": "verify_tasks",
+            "type": "command",
+            "command": "node \"{{HAMES_ROOT_POSIX}}/.claude/hooks/hook_adapter.js\" \"{{HAMES_ROOT_POSIX}}/arsenal/verify_tasks.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "write_file|write_to_file",
+        "hooks": [
+          {
+            "name": "update_arsenal_permissions",
+            "type": "command",
+            "command": "node \"{{HAMES_ROOT_POSIX}}/.claude/hooks/hook_adapter.js\" \"{{HAMES_ROOT_POSIX}}/arsenal/update_arsenal_permissions.js\""
+          }
+        ]
+      },
+      {
+        "matcher": "write_file|replace|write_to_file|replace_file_content|multi_replace_file_content",
+        "hooks": [
+          {
+            "name": "session_logger",
+            "type": "command",
+            "command": "node \"{{HAMES_ROOT_POSIX}}/.claude/hooks/hook_adapter.js\" \"{{HAMES_ROOT_POSIX}}/arsenal/session_logger.js\""
+          }
+        ]
+      }
+    ]
+  }
+}

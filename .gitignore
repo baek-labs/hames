@@ -1,0 +1,99 @@
+# ============================================================================
+# hames — public repo .gitignore
+# ============================================================================
+# Strict baseline: never commit secrets, runtime state, personal artifacts,
+# or auto-generated files. See _Spec/tokenization_map.md [7] for the
+# complementary post-commit verification regex (private dev repo only).
+# ============================================================================
+
+# ─── Secrets ────────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+arsenal/.env
+arsenal/.env.*
+!arsenal/.env.example
+
+arsenal/credentials.json
+arsenal/token.json
+arsenal/.youtube_oauth_client.json
+arsenal/.youtube_oauth_token.json
+
+*.pem
+*.key
+*_rsa
+*_rsa.pub
+*.p12
+*.pfx
+
+# ─── Runtime state (per-machine) ────────────────────────────────────────────
+.claude/.workspace_lock
+.claude/workspace_audit.log
+.claude/scheduled_tasks.lock
+.claude/sessions/
+.claude/settings.local.json
+.claude/workspace_paths.json
+.claude/.context_verifier_disabled
+.codex_tmp/
+
+# ─── Logs ───────────────────────────────────────────────────────────────────
+*.log
+.session_log.jsonl
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Node ───────────────────────────────────────────────────────────────────
+node_modules/
+.pnp/
+.pnp.js
+.yarn/
+dist/
+build/
+.next/
+.turbo/
+.vercel/
+.cache/
+out/
+
+# ─── Python ─────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.env.venv
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ─── OS / Editors ───────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+*.iml
+
+# ─── Auto-regenerated surfaces ──────────────────────────────────────────────
+# .agent/ is mirrored from .codex/skills/ via sync_skills.ps1 — regenerate, do not commit.
+.agent/skills/
+
+# ─── User workspaces (created post-install, never committed) ────────────────
+# The workspaces/ directory only contains _scaffold/ in the repo. User-created
+# workspaces are local working areas, not framework material.
+workspaces/[A-Z]*/
+workspaces/[0-9]*/
+!workspaces/_scaffold/
+!workspaces/README.md
+
+# ─── Git internals (never tracked) ──────────────────────────────────────────
+.git/
+
+# ─── Misc ───────────────────────────────────────────────────────────────────
+*.bak
+*.tmp
+.tmp/
+tmp/

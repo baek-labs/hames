@@ -1,0 +1,38 @@
+description = "Codex 스킬 정본, Antigravity 미러, Gemini CLI 커맨드, Codex hook surface 동기화 — sync_skills.ps1 실행"
+
+prompt = """
+사용자가 `/sync` 슬래시 커맨드를 호출했습니다. 인자: `{{args}}`
+
+## 역할
+슬래시 커맨드 SKILL.md 형식의 Codex 정본과 Antigravity 미러를 동기화하고, Gemini CLI TOML 커맨드 표면과 Codex hook surface를 동기화:
+- 단일 소스: `.codex/skills/` (Codex App/CLI 공용 정본)
+- 미러 타겟: `.agent/skills/` (Antigravity)
+- Gemini CLI: `.gemini/commands/*.toml` (형식이 달라 직접 복사하지 않고 누락 커맨드 생성/검증)
+- Codex hook surface: `.codex/hooks.json`, `.codex/config.toml` (최신 파일을 source hint로 보고 동일 command set으로 정규화)
+
+`.claude/commands/*.md`는 형식이 달라 sync 대상 아님.
+
+## Step 1 — 모드 결정
+인자가 `--dry-run` / `dry-run` / `-DryRun`이면 dry-run, 그 외엔 실제 실행.
+
+## Step 2 — 실행
+
+dry-run인 경우:
+```
+!{powershell -NoProfile -ExecutionPolicy Bypass -File arsenal/sync_skills.ps1 -DryRun}
+```
+
+실제 동기화인 경우:
+```
+!{powershell -NoProfile -ExecutionPolicy Bypass -File arsenal/sync_skills.ps1}
+```
+
+## Step 3 — 결과 보고
+복사된 스킬 수, orphan 제거 수, Gemini 생성 수, Codex hook surface 변경 여부, `VERIFY PASS` / `VERIFY FAIL` 결과 출력.
+FAIL 시 diff 있는 디렉토리 명시 후 수동 확인 요청.
+
+## 주의
+스킬 편집은 항상 `.codex/skills/`에서만 진행. `.agent/skills/`에 직접 편집하면 /sync 시 덮어쓰여짐.
+`.gemini/commands/*.toml`은 TOML 형식이므로 SKILL.md를 byte-level 미러하지 않고, 지원되는 누락 커맨드를 생성하고 전체 목록 존재 여부를 검증한다.
+`.codex/hooks.json`과 `.codex/config.toml`은 포맷이 다르므로 파일 전체를 복사하지 않고 managed hook command만 동기화한다. Agent registry는 유지한다.
+"""

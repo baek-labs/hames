@@ -1,0 +1,44 @@
+# HAMES SYSTEM CURSOR ENTRY v5.4 [STRATEGIC_OS — Redirect to CLAUDE.md]
+
+> Updated: 2026-05-05
+> Cursor의 자동 로드 진입 파일. **단일 진실 출처는 `CLAUDE.md`**이다.
+
+---
+
+## Entry Redirect
+
+이 워크스페이스의 모든 운영 규칙은 `CLAUDE.md`에 정의되어 있다.
+시동 시 아래 6개 파일을 순서대로 읽어 컨텍스트를 구성한다:
+
+1. `CLAUDE.md` (커널)
+2. `.cursor/rules/prompt_engineering.md`
+3. `.cursor/rules/context_engineering.md`
+4. `.cursor/rules/agent_engineering.md`
+5. `.cursor/rules/harness_engineering.md`
+6. `arsenal/CLAUDE.md`
+
+> Cursor는 `@import` 자동 펼침이 없을 수 있다. `CLAUDE.md`의 `@경로` 라인을 보면 그 파일들도 명시적으로 추가 로드한다.
+
+---
+
+## ⚠ MANDATORY ENFORCEMENT
+
+방어선 1/2의 단일 정의 위치는 `.cursor/rules/enforcement.md`다.
+시동 시 위 6개 파일에 더해 **`enforcement.md`도 명시적으로 읽고** 그 안의 규칙을 따른다.
+
+---
+
+## Cursor 전용 보충
+
+- `.cursorrules` 로드 시점에 규칙 활성화 완료. 별도 스크립트 실행 불필요.
+- `HamesSystem 적용` = 규칙 활성화 확인 트리거. 스크립트/파일 생성 없음.
+- 자연어 트리거 해석은 `context_engineering.md` [2] CURRENT MODE 섹션의 단일 정의를 따른다 (`HamesSystem 적용`, `<Workspace> 모드로`, `<Workspace> 모드로 고정`, `고정 해제`).
+
+---
+
+## 핸드오프 처리
+
+- `ai_comm/Memory/.hames_start_gemini.md`가 존재하면 핸드오프 부트스트랩으로 읽는다.
+- `Session lock: ON` 명시 시에만 active workspace/agent/task를 고정한다.
+- `Session lock: OFF` 또는 누락 시 부트스트랩은 권고이며 사용자 지시가 우선.
+- 부트스트랩 파일은 정본(Standard). 세션 상태 변경을 기록하지 않으며 그대로 유지한다.

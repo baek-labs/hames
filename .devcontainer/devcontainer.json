@@ -1,0 +1,47 @@
+{
+  "name": "Hames",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-20-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.11" },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "remoteEnv": {
+    "CLAUDE_PROJECT_DIR": "${containerWorkspaceFolder}"
+  },
+  "secrets": {
+    "ANTHROPIC_API_KEY":   { "description": "Claude Code 로그인용 (선택). 없으면 claude /login 사용." },
+    "OPENAI_API_KEY":      { "description": "openai_specialist.py 용." },
+    "PERPLEXITY_API_KEY":  { "description": "perplexity_tool.js 용." },
+    "NOTION_KEY":          { "description": "notion_tool.js 용." },
+    "GOOGLE_MAPS_KEY":     { "description": "google_tool.js 용." },
+    "NAVER_AD_API_KEY":    { "description": "naver_keyword_tool.js 용." },
+    "NAVER_AD_SECRET_KEY": { "description": "naver_keyword_tool.js 용." },
+    "NAVER_AD_CUSTOMER_ID":{ "description": "naver_keyword_tool.js 용." },
+    "ELEVENLABS_API_KEY":  { "description": "선택. ElevenLabs TTS." },
+    "YOUTUBE_API_KEY":     { "description": "선택. YouTube Data API." },
+    "CORE_AC_UK_API_KEY":  { "description": "선택. CORE 학술 검색." },
+    "SEMANTIC_SCHOLAR_API_KEY": { "description": "선택. Semantic Scholar." },
+    "GOOGLE_CREDENTIALS_JSON": { "description": "credentials.json 전체 내용. Google OAuth 클라이언트." },
+    "GOOGLE_TOKEN_JSON":       { "description": "token.json 전체 내용. Google OAuth 토큰." },
+    "YOUTUBE_OAUTH_CLIENT_JSON": { "description": ".youtube_oauth_client.json 전체 내용." },
+    "YOUTUBE_OAUTH_TOKEN_JSON":  { "description": ".youtube_oauth_token.json 전체 내용." }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "anthropic.claude-code"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "forwardPorts": [5678, 3000, 8080],
+  "portsAttributes": {
+    "5678": { "label": "n8n", "onAutoForward": "silent" },
+    "3000": { "label": "dev",  "onAutoForward": "silent" },
+    "8080": { "label": "alt",  "onAutoForward": "silent" }
+  }
+}

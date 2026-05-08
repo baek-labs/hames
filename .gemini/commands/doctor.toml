@@ -1,0 +1,39 @@
+description = "HamesSystem 규칙 완성도 점검 (System Integrity MRI)"
+
+prompt = """
+사용자가 `/doctor` 슬래시 커맨드를 호출했습니다. 인자: `{{args}}`
+
+## 본 커맨드의 정체
+`/doctor`는 **진단 전용 도구**입니다. 자동 수정은 하지 않습니다.
+스크립트는 JSON 리포트만 출력하며, 모든 수정은 별도 단계로 CEO 승인을 거쳐 수동 적용됩니다.
+
+파일 콘텐츠·인덱스 품질 점검은 `/index` 담당.
+
+진단 카테고리 (스키마: `doctor-2026-05-08.v2`):
+- `issues.stale_permissions` / `arsenal_issues` / `rule_module_issues` / `workspace_isolation_issues`
+- `issues.path_reference_issues` / `command_surface_issues` / `hook_surface_issues` / `runtime_encoding_issues` / `workspace_registry_issues`
+- `documentation_drift_warnings` — `HamesSystem_Public.md` 는 정본이 아니며, 인용된 커널 서명이 실제와 어긋날 때만 좁게 경고
+- `recommended_actions` — `{id, action_type, target_path, proposed_change, risk_level, rationale, source_issue}` 구조
+
+## Mode A — 전체 점검 (인수 없음)
+인수가 없거나 빈 문자열인 경우 전체 시스템 진단을 실행합니다.
+
+## Mode B — 워크스페이스 필터 (인수 = workspace 이름)
+스크립트가 인자를 받아 `workspace_isolation_issues` 만 해당 워크스페이스 항목으로 필터링합니다.
+나머지 시스템 전반 항목은 그대로 보고됩니다.
+
+## 실행 결과
+아래는 `python arsenal/hames_doctor.py {{args}}` 의 출력입니다:
+
+```json
+!{python arsenal/hames_doctor.py {{args}}}
+```
+
+위 JSON 의 `issues.*` / `documentation_drift_warnings` / `recommended_actions` 를 분석하여
+CEO 에게 카테고리별로 핵심 이슈와 위험도를 보고합니다.
+
+## 보고 후 조치 원칙
+- 스크립트는 직접 파일을 수정하지 않습니다.
+- `recommended_actions` 항목별로 위험도(`risk_level`)와 근거(`rationale`)를 함께 제시합니다.
+- CEO 승인된 항목만 별도 단계에서 surgical Edit / 파일 생성 / 항목 제거 등으로 적용합니다.
+"""

@@ -1,0 +1,17 @@
+description = "Perplexity API 실시간 웹 검색 — perplexity_tool.js 호출"
+
+prompt = """
+사용자가 `/search` 슬래시 커맨드를 호출했습니다. 인자(검색어): `{{args}}`
+
+검색어가 없으면 "검색어를 입력해주세요" 응답 후 대기.
+
+## 검색 결과
+```
+!{node arsenal/perplexity_tool.js "{{args}}"}
+```
+
+## 결과 보고 규칙
+- 검색 결과를 그대로 출력.
+- 현재 활성 에이전트 프레임(Marketer / CSO 등)에 맞게 핵심 인사이트 1~3줄 요약 추가.
+- 출처 URL은 결과에 포함된 것만 표시. 임의 생성 금지.
+"""

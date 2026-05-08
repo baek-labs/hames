@@ -1,0 +1,83 @@
+description = "서브모듈 push + Hames gitlink 업데이트 + Hames push을 한 번에 실행"
+
+prompt = """
+사용자가 `/subpush` 슬래시 커맨드를 호출했습니다. 인자: `{{args}}`
+
+서브모듈 작업 후 "서브모듈 push → Hames gitlink bump → Hames push" 3단 흐름 자동화.
+
+## 사용법 분기
+- **A. 서브모듈 안에서 커밋까지 끝낸 경우:** `/subpush <submodule_path>`
+- **B. 워킹트리 변경분 통째로 커밋 + 흐름 전체 실행:** `/subpush <submodule_path> "<commit message>"`
+
+인자 첫 토큰을 `<submodule_path>`로, 나머지를 commit message로 파싱.
+
+## 사전 조건
+- CWD는 Hames 루트(`{{HAMES_ROOT_ESCAPED}}`)여야 함.
+- `<submodule_path>`는 Hames 기준 상대경로 (예: `my-submodule-a`, `my-submodule-b`).
+- 격리 도메인은 이 커맨드 대상이 아님.
+
+## 부정형 결론 안전장치 (전 단계 공통)
+
+이 스킬의 모든 단계에서 "변경 없음 / 이미 동기화됨 / 커밋할 내용 없음 / gitlink 변경 없음" 같은 부정형 결론을 내리기 전:
+
+1. 직전 검증 명령의 raw 출력을 화면에 그대로 표시 (요약·재해석 금지).
+2. raw 출력이 진짜로 비어있을 때만 부정형 결론을 낸다.
+3. raw 출력에 1줄이라도 있으면 다음 단계로 진행.
+
+특히 Step 3의 ahead/behind 카운트, Step 4의 `git status --short <submodule_path>` 출력은 결정 직전에 raw로 박아둔다.
+
+## Step 1 — 인자 검증
+`<submodule_path>`가 비어있으면 "서브모듈 경로를 입력해주세요" 후 중단.
+
+```bash
+!{git config --file .gitmodules --get-regexp path}
+```
+
+위 결과에 `<submodule_path>`가 없으면 "서브모듈이 아닙니다" 출력 후 중단.
+
+## Step 2 — (모드 B인 경우만) 서브모듈 안에서 커밋
+모드 B 진입 전 변경 목록 확인:
+```bash
+!{cd <submodule_path> && git status --short}
+```
+
+CEO 확인 후:
+```bash
+!{cd <submodule_path> && git add -A && git commit -m "<commit message>"}
+```
+
+변경 없으면 "커밋할 내용 없음" 후 Step 3로.
+
+## Step 3 — 서브모듈 push
+```bash
+!{cd <submodule_path> && git rev-list --left-right --count '@{u}...HEAD' 2>/dev/null}
+```
+
+- ahead가 0이면 "이미 동기화됨" 후 Step 4로.
+- ahead 1+이면 `git push`. upstream 미설정이면 사용자에게 보고하고 중단.
+
+## Step 4 — Hames 루트 gitlink 상태
+```bash
+!{cd {{HAMES_ROOT_ESCAPED}} && git status --short <submodule_path>}
+```
+
+` M <submodule_path>` 보이면 Step 5로. 없으면 "gitlink 변경 없음" 후 종료.
+
+## Step 5 — gitlink 커밋 + Hames push
+```bash
+!{cd {{HAMES_ROOT_ESCAPED}} && git add <submodule_path> && git commit -m "chore: bump <submodule_path> gitlink" && git push}
+```
+
+## Step 6 — 최종 검증 보고
+```bash
+!{cd {{HAMES_ROOT_ESCAPED}} && git rev-list --left-right --count origin/main...HEAD}
+```
+
+둘 다 `0	0`이면 "동기화 완료" 한 줄로 마감.
+
+## 안전 규칙
+- Hames 루트의 다른 변경분(예: `n8n/data/*`, untracked 파일)은 절대 같이 add 하지 않음.
+- 커밋 메시지에 `Co-Authored-By` 줄 추가하지 않음.
+- push 전 어떤 destructive 옵션(`--force`, `--no-verify`)도 쓰지 않음.
+- `<submodule_path>`가 dirty 워킹트리(예: 다른 untracked)인데 모드 B로 통째 add하는 건 사용자 의도와 다를 수 있으므로, Step 2 직전에 변경 목록을 보여주고 진행 여부를 명시적으로 확인.
+"""

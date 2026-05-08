@@ -1,0 +1,8 @@
+{
+  "name": "claude-md-management-hames",
+  "description": "Hames-aware fork of claude-md-management. Audits and revises CLAUDE.md files while honoring the v5.5 kernel + .cursor/rules/* module separation, workspace boundaries, defense-line signatures, and isolated domains.",
+  "version": "1.0.0-hames.1",
+  "author": {
+    "name": "Hames"
+  }
+}

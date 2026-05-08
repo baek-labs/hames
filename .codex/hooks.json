@@ -1,0 +1,95 @@
+{
+    "hooks":  {
+                  "PreToolUse":  [
+                                     {
+                                         "matcher":  "Write|Edit|MultiEdit|NotebookEdit|Bash",
+                                         "hooks":  [
+                                                       {
+                                                           "type":  "command",
+                                                           "command":  "node \"$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js\" \"$(git rev-parse --show-toplevel)/.claude/hooks/context_verifier.js\"",
+                                                           "statusMessage":  "Verifying context signatures..."
+                                                       }
+                                                   ]
+                                     },
+                                     {
+                                         "matcher":  "Write|Edit|MultiEdit|NotebookEdit|Bash",
+                                         "hooks":  [
+                                                       {
+                                                           "type":  "command",
+                                                           "command":  "node \"$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js\" \"$(git rev-parse --show-toplevel)/.claude/hooks/workspace_guard.js\"",
+                                                           "statusMessage":  "Checking workspace lock..."
+                                                       }
+                                                   ]
+                                     },
+                                     {
+                                         "matcher":  "Write|Edit|Bash",
+                                         "hooks":  [
+                                                       {
+                                                           "type":  "command",
+                                                           "command":  "node \"$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js\" \"$(git rev-parse --show-toplevel)/arsenal/compliance_auditor.js\""
+                                                       }
+                                                   ]
+                                     },
+                                     {
+                                         "matcher":  "Write",
+                                         "hooks":  [
+                                                       {
+                                                           "type":  "command",
+                                                           "command":  "node \"$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js\" \"$(git rev-parse --show-toplevel)/arsenal/verify_frontmatter_block.js\"",
+                                                           "statusMessage":  "Checking frontmatter gate..."
+                                                       }
+                                                   ]
+                                     }
+                                 ],
+                  "PostToolUse":  [
+                                      {
+                                          "matcher":  "Edit",
+                                          "hooks":  [
+                                                        {
+                                                            "type":  "command",
+                                                            "command":  "node \"$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js\" \"$(git rev-parse --show-toplevel)/arsenal/verify_edit_surgery.js\""
+                                                        }
+                                                    ]
+                                      },
+                                      {
+                                          "matcher":  "Write|Edit",
+                                          "hooks":  [
+                                                        {
+                                                            "type":  "command",
+                                                            "command":  "node \"$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js\" \"$(git rev-parse --show-toplevel)/arsenal/verify_tasks.js\""
+                                                        }
+                                                    ]
+                                      },
+                                      {
+                                          "matcher":  "Write",
+                                          "hooks":  [
+                                                        {
+                                                            "type":  "command",
+                                                            "command":  "node \"$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js\" \"$(git rev-parse --show-toplevel)/arsenal/update_arsenal_permissions.js\""
+                                                        }
+                                                    ]
+                                      },
+                                      {
+                                          "matcher":  "Write",
+                                          "hooks":  [
+                                                        {
+                                                            "type":  "command",
+                                                            "command":  "python \"$(git rev-parse --show-toplevel)/arsenal/index_post_write_auditor.py\"",
+                                                            "timeout":  120,
+                                                            "statusMessage":  "Auditing workspace index..."
+                                                        }
+                                                    ]
+                                      },
+                                      {
+                                          "matcher":  "Write|Edit",
+                                          "hooks":  [
+                                                        {
+                                                            "type":  "command",
+                                                            "command":  "node \"$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js\" \"$(git rev-parse --show-toplevel)/arsenal/session_logger.js\"",
+                                                            "statusMessage":  "Writing session log..."
+                                                        }
+                                                    ]
+                                      }
+                                  ]
+              }
+}

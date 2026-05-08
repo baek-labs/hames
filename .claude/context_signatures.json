@@ -1,0 +1,12 @@
+{
+  "_comment": "Defense line 3 context verifier signatures. Each value is a unique substring that must appear in the first substantive assistant response before guarded tool use.",
+  "_format": "filename -> signature (case-sensitive substring match)",
+  "signatures": {
+    "CLAUDE.md": "HAMES SYSTEM KERNEL v5.5",
+    "prompt_engineering.md": "DEEP_TASK_PROTOCOL",
+    "context_engineering.md": "FIXED LOAD ORDER",
+    "agent_engineering.md": "COO ROUTER",
+    "harness_engineering.md": "DEFINED_CRITICAL_ACTIONS",
+    "arsenal/CLAUDE.md": "HAMES ARSENAL"
+  }
+}

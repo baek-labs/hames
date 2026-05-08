@@ -1,0 +1,142 @@
+# Hames Codex CLI Configuration
+# Project-local config for Codex CLI (occasional use). Codex desktop app uses .codex/hooks.json instead.
+# Event names follow Codex docs (snake_case lowercase: pre_tool_use, post_tool_use).
+
+[features]
+codex_hooks = true
+
+# ─── PreToolUse ───────────────────────────────────────────────────────────────
+
+# context_verifier — 방어선 3: 6개 파일 시그니처 컨텍스트 검증
+[[hooks.pre_tool_use]]
+matcher = "Write|Edit|MultiEdit|NotebookEdit|Bash"
+[[hooks.pre_tool_use.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js" "$(git rev-parse --show-toplevel)/.claude/hooks/context_verifier.js"'
+
+# workspace_guard — 워크스페이스 lock 강제 차단
+[[hooks.pre_tool_use]]
+matcher = "Write|Edit|MultiEdit|NotebookEdit|Bash"
+[[hooks.pre_tool_use.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js" "$(git rev-parse --show-toplevel)/.claude/hooks/workspace_guard.js"'
+
+# compliance_auditor — 규정 준수 감사
+[[hooks.pre_tool_use]]
+matcher = "Write|Edit|Bash"
+[[hooks.pre_tool_use.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js" "$(git rev-parse --show-toplevel)/arsenal/compliance_auditor.js"'
+
+# verify_frontmatter_block — workspaces/ 새 .md 작성 시 frontmatter 누락 즉시 차단
+[[hooks.pre_tool_use]]
+matcher = "Write"
+[[hooks.pre_tool_use.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js" "$(git rev-parse --show-toplevel)/arsenal/verify_frontmatter_block.js"'
+
+# ─── PostToolUse ──────────────────────────────────────────────────────────────
+
+# verify_edit_surgery — 수술적 편집 검증
+[[hooks.post_tool_use]]
+matcher = "Edit"
+[[hooks.post_tool_use.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js" "$(git rev-parse --show-toplevel)/arsenal/verify_edit_surgery.js"'
+
+# verify_tasks — 산출물 검증 (프론트매터 / 푸터 / 링크)
+[[hooks.post_tool_use]]
+matcher = "Write|Edit"
+[[hooks.post_tool_use.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js" "$(git rev-parse --show-toplevel)/arsenal/verify_tasks.js"'
+
+# update_arsenal_permissions — 도구 권한 자동 업데이트
+[[hooks.post_tool_use]]
+matcher = "Write"
+[[hooks.post_tool_use.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js" "$(git rev-parse --show-toplevel)/arsenal/update_arsenal_permissions.js"'
+
+# manager.py inline hook — 워크스페이스 인덱스 자동 갱신
+[[hooks.post_tool_use]]
+matcher = "Write"
+[[hooks.post_tool_use.hooks]]
+type = "command"
+command = 'python "$(git rev-parse --show-toplevel)/arsenal/index_post_write_auditor.py"'
+timeout = 120
+
+# session_logger — 세션 로그 기록
+[[hooks.post_tool_use]]
+matcher = "Write|Edit"
+[[hooks.post_tool_use.hooks]]
+type = "command"
+command = 'node "$(git rev-parse --show-toplevel)/.claude/hooks/hook_adapter.js" "$(git rev-parse --show-toplevel)/arsenal/session_logger.js"'
+
+# ─── Sub-Agent Registry — Level 1 (5) ─────────────────────────────────────────
+
+[agents.cfo]
+description = "재무 분석, ROI 검증, 비용-리스크 평가. CFO Level 1 — cfo_analyst → cfo_auditor 파이프라인 위임."
+config_file = "agents/cfo.toml"
+
+[agents.cso]
+description = "전략 수립, 레버리지 분석, 경쟁 포지셔닝, 병목 제거. CSO Level 1 — cso_analyst → cso_planner 파이프라인 위임."
+config_file = "agents/cso.toml"
+
+[agents.cbo]
+description = "브랜드 정체성, 콘텐츠 기획, 내러티브 설계, 크리에이티브 방향. CBO Level 1 — cbo_writer → cbo_auditor 파이프라인 위임."
+config_file = "agents/cbo.toml"
+
+[agents.cto]
+description = "기술 구현, 시스템 설계, 코드 작성, 아키텍처 검토. CTO Level 1 — cto_architect → cto_coder → cto_reviewer 파이프라인 위임."
+config_file = "agents/cto.toml"
+
+[agents.marketer]
+description = "시장 조사, 트렌드 탐색, 경쟁사 분석, 외부 데이터 검증. Marketer Level 1 — marketer_hunter → marketer_executor 파이프라인 위임."
+config_file = "agents/marketer.toml"
+
+# ─── Sub-Agent Registry — Level 2 (11) ────────────────────────────────────────
+
+[agents.cfo_analyst]
+description = "재무 데이터 수집, 수치 모델링, KPI 계산. CFO Level 2 — 분석 전담."
+config_file = "agents/cfo_analyst.toml"
+
+[agents.cfo_auditor]
+description = "재무 리스크 평가, VETO 집행, 최종 재무 승인. CFO Level 2 — 게이트."
+config_file = "agents/cfo_auditor.toml"
+
+[agents.cso_analyst]
+description = "병목 진단, 레버리지 포인트 식별, 경쟁 변수 분석. CSO Level 2 — 상황 해석 전담."
+config_file = "agents/cso_analyst.toml"
+
+[agents.cso_planner]
+description = "전략 로드맵 구성, 마일스톤 정의, 실행 우선순위 결정. CSO Level 2 — 플래닝 전담."
+config_file = "agents/cso_planner.toml"
+
+[agents.cbo_writer]
+description = "콘텐츠 초안, 카피, 내러티브 생성. CBO Level 2 — 생성 전담."
+config_file = "agents/cbo_writer.toml"
+
+[agents.cbo_auditor]
+description = "콘텐츠 정체성 일관성 감사, 품질 게이트. CBO Level 2 — 게이트."
+config_file = "agents/cbo_auditor.toml"
+
+[agents.cto_architect]
+description = "기술 설계와 아키텍처 결정. CTO Level 2 — 설계 전담."
+config_file = "agents/cto_architect.toml"
+
+[agents.cto_coder]
+description = "실제 코드와 스크립트 구현. CTO Level 2 — 코딩 전담."
+config_file = "agents/cto_coder.toml"
+
+[agents.cto_reviewer]
+description = "코드 품질, 보안, 표준 준수 검토. CTO Level 2 — 게이트."
+config_file = "agents/cto_reviewer.toml"
+
+[agents.marketer_hunter]
+description = "실시간 트렌드, 경쟁사 데이터, 시장 인텔리전스 수집. Marketer Level 2 — 데이터 수집 전담."
+config_file = "agents/marketer_hunter.toml"
+
+[agents.marketer_executor]
+description = "시장 인사이트를 즉시 실행 가능한 산출물로 전환 (카피, 스크립트, 캠페인 초안). Marketer Level 2 — 실행 전환 전담."
+config_file = "agents/marketer_executor.toml"
