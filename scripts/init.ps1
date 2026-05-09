@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Hames installation — Windows (PowerShell).
 
@@ -154,7 +154,7 @@ if ((Test-Path $envExample) -and -not (Test-Path $envFile)) {
     } else {
         Copy-Item $envExample $envFile
         Write-Host "$prefix copied arsenal/.env.example -> arsenal/.env" -ForegroundColor Green
-        Write-Host "$prefix   ⚠  Fill arsenal/.env with your API keys (file is gitignored)" -ForegroundColor Yellow
+        Write-Host "$prefix   [!] Fill arsenal/.env with your API keys (file is gitignored)" -ForegroundColor Yellow
     }
 }
 
@@ -212,8 +212,9 @@ Write-Host ""
 Write-Host "Next steps:"
 Write-Host "  1. Edit arsenal/.env with your API keys (optional)"
 Write-Host "  2. In an AI client (Claude Code / Codex / Gemini CLI), open this directory"
-Write-Host "  3. Type: HamesSystem 적용  (or any first message) — defense lines activate"
-Write-Host "  4. Try: /doctor  — system integrity check"
+Write-Host "  3. Send any first message - defense lines activate"
+Write-Host "     (you will see 'Loaded:' and 'Signatures:' lines in the AI's reply)"
+Write-Host "  4. Try: /doctor  - system integrity check"
 Write-Host ""
 
 exit 0
