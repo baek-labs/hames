@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/baek-labs/hames/schemas/contract.schema.json",
+  "title": "Hames task contract",
+  "type": "object",
+  "required": ["version", "task_id", "project", "goal", "targets", "actions", "scope", "outputs", "invariants", "acceptance_criteria", "required_evidence", "risk", "revision", "status", "spec_hash", "timestamps"],
+  "properties": {
+    "version": { "const": 1 },
+    "task_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+    "project": {
+      "type": "object",
+      "required": ["id", "root", "config_digest"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "root": { "const": "." },
+        "config_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+      }
+    },
+    "goal": { "type": "string", "minLength": 1 },
+    "targets": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "type": { "enum": ["file", "document", "record", "web", "external_service"] },
+          "locator": { "type": "string", "minLength": 1 },
+          "provider": { "type": "string" },
+          "resource_kind": { "type": "string" },
+          "account": { "type": "string" },
+          "origin": { "type": "string", "format": "uri" },
+          "path": { "type": "string" },
+          "parent": { "type": "string" },
+          "planned_name": { "type": "string" }
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "target", "kind", "risk", "required_evidence"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "target": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["read", "create", "update", "send", "publish", "delete"] },
+          "risk": { "enum": ["normal", "critical"] },
+          "risk_categories": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "mutation_mode": { "enum": ["patch", "replace", "destructive_overwrite"] },
+          "required_evidence": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          "evidence_exception": {
+            "type": "object",
+            "required": ["reason", "user_approved"],
+            "properties": {
+              "reason": { "type": "string", "minLength": 1 },
+              "user_approved": { "const": true }
+            }
+          }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "required": ["allow", "deny"],
+      "properties": {
+        "allow": { "type": "array", "items": { "type": "string" } },
+        "deny": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "outputs": { "type": "array" },
+    "invariants": { "type": "array", "items": { "type": "string" } },
+    "acceptance_criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "evidence_ids"],
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "evidence_ids": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+        }
+      }
+    },
+    "required_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "action_id", "predicate"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "enum": ["command", "test", "file_diff", "api_state", "browser_state", "checklist"] },
+          "action_id": { "type": "string" },
+          "phase": { "enum": ["before", "action", "after"] },
+          "command": { "type": "string" },
+          "predicate": { "type": "object" }
+        }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "required": ["level", "critical_actions"],
+      "properties": {
+        "level": { "enum": ["normal", "critical"] },
+        "critical_actions": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "exceptions": { "type": "array" },
+    "revision": { "type": "integer", "minimum": 1 },
+    "status": { "enum": ["DRAFT", "AMENDMENT_PENDING", "READY", "ACTIVE", "REVIEW", "ACCEPTED", "ARCHIVED"] },
+    "spec_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "approval": { "type": ["object", "null"] },
+    "acceptance": { "type": "object" },
+    "timestamps": { "type": "object" }
+  }
+}

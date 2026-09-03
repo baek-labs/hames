@@ -1,0 +1,12 @@
+version: 1
+project:
+  name: {{PROJECT_NAME_JSON}}
+  root: "."
+workspaces: {{WORKSPACES_JSON}}
+tracking:
+  contracts: {{CONTRACT_TRACKING_JSON}}
+guards:
+  enabled: true
+  critical_actions: ["delete", "destructive_overwrite", "send", "publish", "deploy", "payment", "permission_change", "external_mutation"]
+features: ["setup", "ready", "go", "doctor"]
+extensions: {}

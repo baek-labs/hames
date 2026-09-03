@@ -1,6 +1,7 @@
-# Force LF for shell scripts and configs that run inside Linux containers / Codespaces.
-*.sh        text eol=lf
-*.bash      text eol=lf
-.devcontainer/* text eol=lf
-.claude/hooks/*.js text eol=lf
-arsenal/*.sh text eol=lf
+* text=auto
+*.js text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf

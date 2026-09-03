@@ -1,0 +1,917 @@
+{
+  "version": 1,
+  "id": "public-main-01",
+  "source": "https://github.com/baek-labs/hames",
+  "branch": "main",
+  "commits": [
+    "e79ec568e38cc1820045d5b2969ad3ff9e942d62"
+  ],
+  "files": [
+    {
+      "path": ".claude/agents/cbo_auditor.md",
+      "kind": "file",
+      "sha256": "sha256:caea1f74e318e1c6ffca6e694c9b7e111683e4239c62590a54767a9f509e1727",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cbo_writer.md",
+      "kind": "file",
+      "sha256": "sha256:5c90e9a1685df416320b7833925cdba9f73b723dd05834b63590ce268341ffe2",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cbo.md",
+      "kind": "file",
+      "sha256": "sha256:28e8b6ecd66160f0445fb77aaf1add8d533882c6a523d6eed8d47bc58a1f19cf",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cfo_analyst.md",
+      "kind": "file",
+      "sha256": "sha256:a6fd8856c46be74c5a7ae74bde6aaf8f71a201fa86697be9af5f00843552b079",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cfo_auditor.md",
+      "kind": "file",
+      "sha256": "sha256:3cb64e7048e99021f7b7fde3a8116cd9ebd08ba7da8726766151b7668ead9115",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cfo.md",
+      "kind": "file",
+      "sha256": "sha256:ec46c3033e3db1b239c2b2713c2b97dd369ad5a5037fd183f15c6141198e56b4",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cso_analyst.md",
+      "kind": "file",
+      "sha256": "sha256:463c93e94e0c10d02f09a839e542728abb5c8cc5a7d792860c41345b007b3ec6",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cso_planner.md",
+      "kind": "file",
+      "sha256": "sha256:7c0707d6fef065a5beb02390337b9376ee7b22b89f0f59c254b61f2b5bcf7246",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cso.md",
+      "kind": "file",
+      "sha256": "sha256:9b97238f545103f460fcf1fb36f66195f0d729687d0da79457853421aa74e2cc",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cto_architect.md",
+      "kind": "file",
+      "sha256": "sha256:b8a032c4305ef39d82ff8e37cfdbf7206fdd693c6179f99b5cc0b71a64305789",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cto_coder.md",
+      "kind": "file",
+      "sha256": "sha256:6d69b35f48e68ba69c971ea430d0b13982ef61e7deb0bf0281270558f007c27f",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cto_reviewer.md",
+      "kind": "file",
+      "sha256": "sha256:c0b8ce948689beceef818ff681b054b4ee066ff3062d2957fe6987ad3abb1c19",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/cto.md",
+      "kind": "file",
+      "sha256": "sha256:76ebe1b65b7012ae438e119a904965cdcc2abe70df0f9f3b84b38422a1a792f3",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/marketer_executor.md",
+      "kind": "file",
+      "sha256": "sha256:0e08b799cdf0e95e2b0e17d79ed949d834f4eca9d7c0ec51766c7c8338fbdf7d",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/marketer_hunter.md",
+      "kind": "file",
+      "sha256": "sha256:4267aac80058b73f42271dd5933571bfd4adc5285167076d30398539c9f78edf",
+      "protected": false
+    },
+    {
+      "path": ".claude/agents/marketer.md",
+      "kind": "file",
+      "sha256": "sha256:6c1a03860cd473d7e320056c85654932feaf1d99101d2c16f2fe81250756cb46",
+      "protected": false
+    },
+    {
+      "path": ".claude/commands/close-handoff.md",
+      "kind": "file",
+      "sha256": "sha256:66fb021ee30dd0011f890ac12a7473a047c47fa7787de4d3e0a0f202650ff301",
+      "protected": false
+    },
+    {
+      "path": ".claude/commands/doctor.md",
+      "kind": "file",
+      "sha256": "sha256:4e8c8a524ea39a30b023eb2322f6c5539ab5a7930bf7b10a8af02c5621f58690",
+      "protected": false
+    },
+    {
+      "path": ".claude/commands/handoff.md",
+      "kind": "file",
+      "sha256": "sha256:09de6645411af5082d08dc369ed84f2abbc1fb532e95403154ce4f6b2c97e47e",
+      "protected": false
+    },
+    {
+      "path": ".claude/commands/index.md",
+      "kind": "file",
+      "sha256": "sha256:6e28f7a23d3d0e94ae236dbbc23d637fefd3ef0b04b173a9ccdf3b9f02468e3d",
+      "protected": false
+    },
+    {
+      "path": ".claude/commands/lock.md",
+      "kind": "file",
+      "sha256": "sha256:73b1bb290e92e5e8a292684b6182751b6e2831fb66e6e4bb271332fa02e6e78e",
+      "protected": false
+    },
+    {
+      "path": ".claude/commands/save.md",
+      "kind": "file",
+      "sha256": "sha256:9a4f99b2434809bef1c3eceb3db808a12def032e4566354e29d4337cb67e1497",
+      "protected": false
+    },
+    {
+      "path": ".claude/commands/search.md",
+      "kind": "file",
+      "sha256": "sha256:9069378566e13c61de9bf1917629affe6c19d550aff05cd91500d28d85053842",
+      "protected": false
+    },
+    {
+      "path": ".claude/commands/subpush.md",
+      "kind": "file",
+      "sha256": "sha256:f6dc291b3cd786ff84edcac932dd22e0d9b2c20fc25737364d3e905235127404",
+      "protected": false
+    },
+    {
+      "path": ".claude/commands/sync.md",
+      "kind": "file",
+      "sha256": "sha256:f55a3b5a6d3c9fa7f2a00d663b96906f574b59ba61ceec86d2d953f905b7823d",
+      "protected": false
+    },
+    {
+      "path": ".claude/context_signatures.json",
+      "kind": "file",
+      "sha256": "sha256:3b8a3a64157b115af0b355da0cef84c0d0c4bc1929442bed05a738d2867c4cfb",
+      "protected": false
+    },
+    {
+      "path": ".claude/hooks/context_verifier.js",
+      "kind": "file",
+      "sha256": "sha256:1f5ae2aef6a0c1bc3f3304c7a531ee6c195ba357a089add7ee6e1c576ca89102",
+      "protected": false
+    },
+    {
+      "path": ".claude/hooks/hook_adapter.js",
+      "kind": "file",
+      "sha256": "sha256:dfcbd6074caf2053b13416c93d4d47dbd1dc859d5ae540173e416e8812577599",
+      "protected": false
+    },
+    {
+      "path": ".claude/hooks/session_capture.js",
+      "kind": "file",
+      "sha256": "sha256:999990ac994e731f4a37c9108bcf2f1c3816839903479bd733259eb43f5c022a",
+      "protected": false
+    },
+    {
+      "path": ".claude/hooks/workspace_guard.js",
+      "kind": "file",
+      "sha256": "sha256:1827efe9bb88b2f4bcb51ee66b40384355a81d37535164c61a8282a159e96881",
+      "protected": false
+    },
+    {
+      "path": ".claude/settings.json",
+      "kind": "file",
+      "sha256": "sha256:055590f9a89d66b183b536d06b8de1d49de8e8357bc906359f8005ca336ebddd",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cbo_auditor.toml",
+      "kind": "file",
+      "sha256": "sha256:9524167d984000eb5adac52b52e8cf637c38714c9803e6e7d5868de7bc17bcfe",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cbo_writer.toml",
+      "kind": "file",
+      "sha256": "sha256:f3274628a5d4f80cac27636f9e5c52e01c19409b6e004fa0eac39523cfccec41",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cbo.toml",
+      "kind": "file",
+      "sha256": "sha256:4e325f270681fd3cd95a145182f0b8f01d74fef4215ed1d3cfd5440c073dc494",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cfo_analyst.toml",
+      "kind": "file",
+      "sha256": "sha256:a1e108d624b65d988bba4ce324020ff2ddf7b54c388ea70e1c8cd3effdd50af4",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cfo_auditor.toml",
+      "kind": "file",
+      "sha256": "sha256:089caa02fcb5c5a34d61cf114b35acdcfaaf281271144c600275fda5ff93f382",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cfo.toml",
+      "kind": "file",
+      "sha256": "sha256:dbafccb9c670d2e112db9479ff85469776e590b605871e93bcb72936d92a9aa6",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cso_analyst.toml",
+      "kind": "file",
+      "sha256": "sha256:6717643a84ebfe93e0f43996cfd99baed8f8a2a01f8921300583eb7014b41175",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cso_planner.toml",
+      "kind": "file",
+      "sha256": "sha256:7ad453cf3275fc97e258c44647b1697ff175512e8ffb081059d9790dc3456c3f",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cso.toml",
+      "kind": "file",
+      "sha256": "sha256:6709e5d6f68b6b3dd2cda0ef9ac46188cd28b60c543180b5aeffc966738e648c",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cto_architect.toml",
+      "kind": "file",
+      "sha256": "sha256:f8bf2c7695b45cb9fa56350baf00d3cfa709beadcebc0fb1488633a4590f2351",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cto_coder.toml",
+      "kind": "file",
+      "sha256": "sha256:3d2c3327145859193d1bbdeb13fa82e05839f2b465ddeb274047368b2d073442",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cto_reviewer.toml",
+      "kind": "file",
+      "sha256": "sha256:2906ad0ac0b8f85853400b949b14b339d0d172b49194ba1ed48a586704677001",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/cto.toml",
+      "kind": "file",
+      "sha256": "sha256:b3a2598ea471ec29ed3ccc0ca7e48757f7d39ff8c92555e67eee87bb6f84bad1",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/marketer_executor.toml",
+      "kind": "file",
+      "sha256": "sha256:f293c86d76ac888f2516388cf853b6bf80430ef05f4ca2d9bd16e6ba73395fd5",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/marketer_hunter.toml",
+      "kind": "file",
+      "sha256": "sha256:55ea55168d25b55ffc6c1b19fd64894e4fa06d1cf0cb0fa9269fca22583f48ba",
+      "protected": false
+    },
+    {
+      "path": ".codex/agents/marketer.toml",
+      "kind": "file",
+      "sha256": "sha256:580ae0613a4df7f9b3cfb9e0f4f6e175ca7e07a58c19c7899a9ee93e490964ea",
+      "protected": false
+    },
+    {
+      "path": ".codex/config.toml",
+      "kind": "file",
+      "sha256": "sha256:603e6adab529e9a267ab189ef4557ad55849e5c53aa41c7c96a416d7a99ea752",
+      "protected": false
+    },
+    {
+      "path": ".codex/hooks.json",
+      "kind": "file",
+      "sha256": "sha256:f8e28a21ee1cee2d34cefc99e19d1ba3b49b17ff7447dce805a1c30c424c0e64",
+      "protected": false
+    },
+    {
+      "path": ".codex/skills/source-command-close-handoff/SKILL.md",
+      "kind": "file",
+      "sha256": "sha256:01122c762e77c481d94f552d486233bc6fd330a3af6e65e5b9ad84efa885d850",
+      "protected": false
+    },
+    {
+      "path": ".codex/skills/source-command-doctor/SKILL.md",
+      "kind": "file",
+      "sha256": "sha256:5a8fb7ef013496474a80a9658c29f3e62389bb4bba868b9a5940a58070274532",
+      "protected": false
+    },
+    {
+      "path": ".codex/skills/source-command-handoff/SKILL.md",
+      "kind": "file",
+      "sha256": "sha256:fc937c0978ff401cfd31b39fe62463d104eb8b33048b4ac1d908acc50ed6a829",
+      "protected": false
+    },
+    {
+      "path": ".codex/skills/source-command-index/SKILL.md",
+      "kind": "file",
+      "sha256": "sha256:7598511e12557703f991f7cfd943f7df9fe992f59eabe8cfeaa9c3068a32a29b",
+      "protected": false
+    },
+    {
+      "path": ".codex/skills/source-command-lock/SKILL.md",
+      "kind": "file",
+      "sha256": "sha256:d5ef9d34845d135a72379bc4b29ffc011622e16b085949af842340366d3f178c",
+      "protected": false
+    },
+    {
+      "path": ".codex/skills/source-command-save/SKILL.md",
+      "kind": "file",
+      "sha256": "sha256:dfc15fbb16b38c968a5f61996551e180eeb5aa307ed5a52b9eed9378d4b95311",
+      "protected": false
+    },
+    {
+      "path": ".codex/skills/source-command-search/SKILL.md",
+      "kind": "file",
+      "sha256": "sha256:0d4ccd83c67942fc7f8c6faf538dc783c8973b7a03a26b878d56c8f067d9fa75",
+      "protected": false
+    },
+    {
+      "path": ".codex/skills/source-command-subpush/SKILL.md",
+      "kind": "file",
+      "sha256": "sha256:fa6896076917fa752189db4c9bb2d772fc4b4e34536ebe32b821b1ae52fa1a63",
+      "protected": false
+    },
+    {
+      "path": ".codex/skills/source-command-sync/SKILL.md",
+      "kind": "file",
+      "sha256": "sha256:8e6d7834bea320db2d59d4cfb9dde3834c55dc47abd4fc8259bb3a86edaa040b",
+      "protected": false
+    },
+    {
+      "path": ".cursor/rules/agent_engineering.md",
+      "kind": "file",
+      "sha256": "sha256:06a454568a84b2993105d93546ecf02c06c73dfe06e04494d7bd0c2cdfb426a1",
+      "protected": false
+    },
+    {
+      "path": ".cursor/rules/context_engineering.md",
+      "kind": "file",
+      "sha256": "sha256:3c4169443b625cd2f3f0936b8e465d1161683ee7615c4bf5082f0fd733cd4e9f",
+      "protected": false
+    },
+    {
+      "path": ".cursor/rules/enforcement.md",
+      "kind": "file",
+      "sha256": "sha256:609a7607cf7ac31a3be163a4c7ef8c32f15d2a786cc9808f95b87a06a9cfaf89",
+      "protected": false
+    },
+    {
+      "path": ".cursor/rules/harness_engineering.md",
+      "kind": "file",
+      "sha256": "sha256:52dd0adebe6b9bf7c214c03f60112520b20e0a41a8c532752d80f60f9d17b775",
+      "protected": false
+    },
+    {
+      "path": ".cursor/rules/prompt_engineering.md",
+      "kind": "file",
+      "sha256": "sha256:671608bd5626e793812a350613bf3c8825bd0453e3a9640780705afe5ad79a9f",
+      "protected": false
+    },
+    {
+      "path": ".cursorrules",
+      "kind": "file",
+      "sha256": "sha256:9521e55261781eee17d101ec0b1c2b99c8f99431b8abd04bc6f39676c4f1f666",
+      "protected": false
+    },
+    {
+      "path": ".devcontainer/devcontainer-lock.json",
+      "kind": "file",
+      "sha256": "sha256:87a533f5dd8710769793662da1f1a1b3c6759958f614ef41e65d1045faef35b3",
+      "protected": false
+    },
+    {
+      "path": ".devcontainer/devcontainer.json",
+      "kind": "file",
+      "sha256": "sha256:17f2094b52153d51fbc442d7eb80da70431af886da16374fad82fe62502d394b",
+      "protected": false
+    },
+    {
+      "path": ".devcontainer/setup.sh",
+      "kind": "file",
+      "sha256": "sha256:c0f336a38394a7d365fae1c74b5de68de3f6e70a79a8ce001e15580f1e7ef54d",
+      "protected": false
+    },
+    {
+      "path": ".gemini/commands/close-handoff.toml",
+      "kind": "file",
+      "sha256": "sha256:599c0a51f2ec2ed3cebc4144dcf55cc9f659780d0e1c606a21ef34d5600a152b",
+      "protected": false
+    },
+    {
+      "path": ".gemini/commands/doctor.toml",
+      "kind": "file",
+      "sha256": "sha256:ddcc4d606a73be11bf20100a2418e17bad7f96e06314b1fb25dfac633a3c7142",
+      "protected": false
+    },
+    {
+      "path": ".gemini/commands/handoff.toml",
+      "kind": "file",
+      "sha256": "sha256:7a5209f76f76d23d8f9325c5c8a296698eeef5e5e65d649045bc13fe14ad5d07",
+      "protected": false
+    },
+    {
+      "path": ".gemini/commands/index.toml",
+      "kind": "file",
+      "sha256": "sha256:347e491f07e071786e3654d78977a6e08440a6b8ae256cb3bb878125c0e6b82c",
+      "protected": false
+    },
+    {
+      "path": ".gemini/commands/lock.toml",
+      "kind": "file",
+      "sha256": "sha256:d32e6c74ef6863df0fbcb55d9ad5618874df83b3088ad98a013ecb8e6da94c97",
+      "protected": false
+    },
+    {
+      "path": ".gemini/commands/save.toml",
+      "kind": "file",
+      "sha256": "sha256:84775e454e007dfcf103873002d0e040a4cb6c5b7d490068a39bfd7a4f66003d",
+      "protected": false
+    },
+    {
+      "path": ".gemini/commands/search.toml",
+      "kind": "file",
+      "sha256": "sha256:aacefead1a2ebf89c0901c5555be1c59701a313b0d578cca66cbbcdf6d655d4d",
+      "protected": false
+    },
+    {
+      "path": ".gemini/commands/subpush.toml",
+      "kind": "file",
+      "sha256": "sha256:95f97b83969cc85cc2cf7ab48775a80538e084ad4698a909a3ed1490519f05c4",
+      "protected": false
+    },
+    {
+      "path": ".gemini/commands/sync.toml",
+      "kind": "file",
+      "sha256": "sha256:ade51baed160057a97c9e8303fe78c1e57f3d55ed89e037553843a00c9f97e7a",
+      "protected": false
+    },
+    {
+      "path": ".gemini/settings.json",
+      "kind": "file",
+      "sha256": "sha256:b96ff317640e7dc6e32a481875cafd20422ac27869f27b7f03735a8422333ad6",
+      "protected": false
+    },
+    {
+      "path": ".gitattributes",
+      "kind": "file",
+      "sha256": "sha256:d85b4e3b9af9bcba6b3b6c0a167ac02f892d444a374835135b8508d5a544b1b7",
+      "protected": false
+    },
+    {
+      "path": ".gitignore",
+      "kind": "file",
+      "sha256": "sha256:d11ce2f15c6cfc73eb7b9dec15e162129c2183c998ae74950eade5b47c09ba7c",
+      "protected": false
+    },
+    {
+      "path": ".vscode/settings.json",
+      "kind": "file",
+      "sha256": "sha256:2569cf0a763970f99383a2e6563a9e2e532d211b178b8b7cde10ad14ae59dc46",
+      "protected": false
+    },
+    {
+      "path": "AGENTS.md",
+      "kind": "file",
+      "sha256": "sha256:35ea047f30293d2d3c72446725afaab235e34af85a57a6a24bec6abf2f2260b9",
+      "protected": false
+    },
+    {
+      "path": "arsenal/.env.example",
+      "kind": "file",
+      "sha256": "sha256:bd91d350c17b43c6142f716f17a1d12827870a42c0c98c141306ddf4c979fcec",
+      "protected": false
+    },
+    {
+      "path": "arsenal/audio_transcriber.py",
+      "kind": "file",
+      "sha256": "sha256:738712c573464a492a296551fcbeff779c36a4d9ada2c457d2ecd6b2a4a255a5",
+      "protected": false
+    },
+    {
+      "path": "arsenal/audit_exclusions.json",
+      "kind": "file",
+      "sha256": "sha256:ba996a583b0d7847b3130841977fcc3b6ca2f7ad46f80f85df638de33b9e6c1d",
+      "protected": false
+    },
+    {
+      "path": "arsenal/CLAUDE.md",
+      "kind": "file",
+      "sha256": "sha256:ed3579d1bcb414fa8d237716be652e48f34148687c4daa036fffe6b1483eeb70",
+      "protected": false
+    },
+    {
+      "path": "arsenal/close_handoff.ps1",
+      "kind": "file",
+      "sha256": "sha256:3059e9aa04c74c04a7b7dca1f22d3455a843cd929df531611c4426ba95a65a01",
+      "protected": false
+    },
+    {
+      "path": "arsenal/compliance_auditor.js",
+      "kind": "file",
+      "sha256": "sha256:eea1658b6811da3f4c7313e5a53a62d522e1de6fd8dd503fe92ef0b5291e8aad",
+      "protected": false
+    },
+    {
+      "path": "arsenal/create_handoff.ps1",
+      "kind": "file",
+      "sha256": "sha256:dc24a4cbedf69e78ed44677c0b2a4522966c1a8a1c6271bba63c152a3eac5c3b",
+      "protected": false
+    },
+    {
+      "path": "arsenal/credentials.example.json",
+      "kind": "file",
+      "sha256": "sha256:eb8afa54cc86623f520b573f4378e8e197af2981d0ba09d028d0aa864705bdcb",
+      "protected": false
+    },
+    {
+      "path": "arsenal/google_tool.js",
+      "kind": "file",
+      "sha256": "sha256:4752f897c163b5f7b6862ec492cca2773a6b3f833d23420fdb79b6838464e489",
+      "protected": false
+    },
+    {
+      "path": "arsenal/hames_doctor.py",
+      "kind": "file",
+      "sha256": "sha256:7bcc78551ef574c6f91369ba380b4ad5157145740e583ba1282c68c92a7474d6",
+      "protected": false
+    },
+    {
+      "path": "arsenal/hames_wrap.ps1",
+      "kind": "file",
+      "sha256": "sha256:66585fd1e9601fe38993598aa9895df9fb2dec647d0dab9c5be8507b7abb2702",
+      "protected": false
+    },
+    {
+      "path": "arsenal/index_post_write_auditor.py",
+      "kind": "file",
+      "sha256": "sha256:21c20d2ff3d8b2ed5ed90870473ef5e815a3b8e78cb426151e152a8afbfd11fc",
+      "protected": false
+    },
+    {
+      "path": "arsenal/manager.py",
+      "kind": "file",
+      "sha256": "sha256:d0c60f1a216c1dd98cf83e268d54a65aa50ff761fa0f7fa201c06a6ca36c59dd",
+      "protected": false
+    },
+    {
+      "path": "arsenal/naver_blog_scraper.js",
+      "kind": "file",
+      "sha256": "sha256:e6637ad291c749340fd1057a123778a66cf444e220166bce3a7c53d5b3cfe922",
+      "protected": false
+    },
+    {
+      "path": "arsenal/naver_keyword_tool.js",
+      "kind": "file",
+      "sha256": "sha256:ea002ed672c7f5ccc7d41bcab04a867ed12841097040b24ceb85d971907ee04b",
+      "protected": false
+    },
+    {
+      "path": "arsenal/notion_tool.js",
+      "kind": "file",
+      "sha256": "sha256:643e2ab064fa0f8cfcc53f76593a7c5fc84fbc4a4617266977c5eba35a827aab",
+      "protected": false
+    },
+    {
+      "path": "arsenal/openai_specialist.py",
+      "kind": "file",
+      "sha256": "sha256:bb7ada85fac889aaec3dbc121df0cb9f0e47d8236306fd4fb6034090a998ca1b",
+      "protected": false
+    },
+    {
+      "path": "arsenal/package-lock.json",
+      "kind": "file",
+      "sha256": "sha256:2d5da7c2ef8db07e6a3e21211e4649e57d59c6c685abb2467add5086698162b4",
+      "protected": false
+    },
+    {
+      "path": "arsenal/package.json",
+      "kind": "file",
+      "sha256": "sha256:d58c700eb92f0a33ecd683379a130f2e48d7d7ac23c75c137c88fcae898c57cc",
+      "protected": false
+    },
+    {
+      "path": "arsenal/pdf_manager.py",
+      "kind": "file",
+      "sha256": "sha256:44c358fb56a235c9205b997a3f752991a898518c88c8ac7f5e423b9f0a0f5933",
+      "protected": false
+    },
+    {
+      "path": "arsenal/perplexity_tool.js",
+      "kind": "file",
+      "sha256": "sha256:7fde94a4962e446c9c94bdb4fa412a8245686864d4a20d1bab7d776308785448",
+      "protected": false
+    },
+    {
+      "path": "arsenal/plugins/hames-local/.claude-plugin/marketplace.json",
+      "kind": "file",
+      "sha256": "sha256:451218f131e3d2b264ca4e9ef9b5b7e17a49c8fe88cdbab29e88ccb08baf9126",
+      "protected": false
+    },
+    {
+      "path": "arsenal/plugins/hames-local/plugins/claude-md-management-hames/.claude-plugin/plugin.json",
+      "kind": "file",
+      "sha256": "sha256:561c85b8e05b12293a5fc3c1f27f8be81ebe4a57c684de903fa3786bf8f60427",
+      "protected": false
+    },
+    {
+      "path": "arsenal/plugins/hames-local/plugins/claude-md-management-hames/commands/revise-claude-md.md",
+      "kind": "file",
+      "sha256": "sha256:6c9c24d085dec2eaf57ea813d7c0a637b33ed018b3129d0cef61b7e76559cdc2",
+      "protected": false
+    },
+    {
+      "path": "arsenal/plugins/hames-local/plugins/claude-md-management-hames/skills/claude-md-improver/references/hames-routing.md",
+      "kind": "file",
+      "sha256": "sha256:e2082e19b3d6bcf0ac9e9ddb2542e855abd68753f9571758fb46038d41ea36d6",
+      "protected": false
+    },
+    {
+      "path": "arsenal/plugins/hames-local/plugins/claude-md-management-hames/skills/claude-md-improver/references/quality-criteria.md",
+      "kind": "file",
+      "sha256": "sha256:383def16b05dca948297dd1acb33f007cb1b1b2c368454d424c5634348a8bab1",
+      "protected": false
+    },
+    {
+      "path": "arsenal/plugins/hames-local/plugins/claude-md-management-hames/skills/claude-md-improver/references/templates.md",
+      "kind": "file",
+      "sha256": "sha256:de0aa3ac30120a0c77f9cd82738a75ed8326864f98feb89356a253f2deaf3ab0",
+      "protected": false
+    },
+    {
+      "path": "arsenal/plugins/hames-local/plugins/claude-md-management-hames/skills/claude-md-improver/references/update-guidelines.md",
+      "kind": "file",
+      "sha256": "sha256:02a158d6ca41a0ab702a67a213e92205f09c073cea53796633251bc62fd7ec55",
+      "protected": false
+    },
+    {
+      "path": "arsenal/plugins/hames-local/plugins/claude-md-management-hames/skills/claude-md-improver/SKILL.md",
+      "kind": "file",
+      "sha256": "sha256:8ac64d422a6b4d9c1fedb57fc18a4086f60310f9de3abd1e493a13c35074326b",
+      "protected": false
+    },
+    {
+      "path": "arsenal/ppt_manager.py",
+      "kind": "file",
+      "sha256": "sha256:56d708c7993220e9378183a25e530770efcd045227e2d1450a614a670503b78b",
+      "protected": false
+    },
+    {
+      "path": "arsenal/pre_push_guard.sh",
+      "kind": "file",
+      "sha256": "sha256:b9d3be503c899160d90cc5d79d11f539bc9d448511feadd74ca2992c54569155",
+      "protected": false
+    },
+    {
+      "path": "arsenal/run_hames_guarded.ps1",
+      "kind": "file",
+      "sha256": "sha256:3e1c26e487e959bee9969497454ae9deb80a80868a84a89d686067b59fc0e80c",
+      "protected": false
+    },
+    {
+      "path": "arsenal/seo_report.js",
+      "kind": "file",
+      "sha256": "sha256:9e9d21dba1175a4670f2048fef4ab26c4b5882506d583f7c1558d8568d346f0c",
+      "protected": false
+    },
+    {
+      "path": "arsenal/session_logger.js",
+      "kind": "file",
+      "sha256": "sha256:957a832865c18caa65e2f2f4e5cb995032bd8fe2aefe8169644b84bb55efea70",
+      "protected": false
+    },
+    {
+      "path": "arsenal/set_hames_utf8.ps1",
+      "kind": "file",
+      "sha256": "sha256:3fcdc68325946ca4f5d8e3d7a1faeadf52919d5dd4505f9b5ce59a6b7a43b5c2",
+      "protected": false
+    },
+    {
+      "path": "arsenal/set_workspace_lock.ps1",
+      "kind": "file",
+      "sha256": "sha256:772b4672b56942865d15bfb9c94cb03c7e980e0c73cb6c2f1605aeeaaa4df7f9",
+      "protected": false
+    },
+    {
+      "path": "arsenal/start_hames_codex.ps1",
+      "kind": "file",
+      "sha256": "sha256:f94fdcfc884a5b8e75a65e56cb0c9d3cdcac242f7d3e4cfdedca50963564c38a",
+      "protected": false
+    },
+    {
+      "path": "arsenal/start_hames_gemini.ps1",
+      "kind": "file",
+      "sha256": "sha256:89c16432155744992652574a0f381335ad8313d719b0d4724fae3a74834232f5",
+      "protected": false
+    },
+    {
+      "path": "arsenal/sync_skills.ps1",
+      "kind": "file",
+      "sha256": "sha256:9474f1508b96f54e111834ff42c514f9bd8d23264ed143f536b119c7f63d1dc9",
+      "protected": false
+    },
+    {
+      "path": "arsenal/test_report_shape.py",
+      "kind": "file",
+      "sha256": "sha256:ca7819e9c91306a3b981372098652f9967cbf83cfb86bbcf3c05f82829c6cac0",
+      "protected": false
+    },
+    {
+      "path": "arsenal/token.example.json",
+      "kind": "file",
+      "sha256": "sha256:ccaf59c531ad5050d9918a11155b885b8cded822a48006b7aaf09cbf87dec827",
+      "protected": false
+    },
+    {
+      "path": "arsenal/update_arsenal_permissions.js",
+      "kind": "file",
+      "sha256": "sha256:e0eac3344d0f1d1e78d0884de600b2df68d793b3e4e0a4b1917c08b43fd88ad5",
+      "protected": false
+    },
+    {
+      "path": "arsenal/validate_handoff.ps1",
+      "kind": "file",
+      "sha256": "sha256:edd6b4a348905e333143e4cce01dd1f3442e580b2953e77dde369fda85c19aff",
+      "protected": false
+    },
+    {
+      "path": "arsenal/verify_edit_surgery.js",
+      "kind": "file",
+      "sha256": "sha256:8b4d9957e2b88636bf766d9a5e69a27ee53489527068f9d9581341c5d2655d40",
+      "protected": false
+    },
+    {
+      "path": "arsenal/verify_frontmatter_block.js",
+      "kind": "file",
+      "sha256": "sha256:19fad3d0f413b644b130729e5d7aca88084a6ae9655f98397296c974fc771550",
+      "protected": false
+    },
+    {
+      "path": "arsenal/verify_tasks.js",
+      "kind": "file",
+      "sha256": "sha256:8a7f2677075b447d0d9e98bb50479ce1b3af86c49ac355475115cb7c686f8987",
+      "protected": false
+    },
+    {
+      "path": "arsenal/video_manager.py",
+      "kind": "file",
+      "sha256": "sha256:ceb7641379d60b2bcf5b8e776237b3948d5248ddc4d34084acdf0129348f8c8f",
+      "protected": false
+    },
+    {
+      "path": "CLAUDE.md",
+      "kind": "file",
+      "sha256": "sha256:66ae114506338e06b891d2868942fbe8530dfa6abf4abf259299d049adf137c3",
+      "protected": false
+    },
+    {
+      "path": "docs/01_philosophy.md",
+      "kind": "file",
+      "sha256": "sha256:1f1f102e33f4a1d5f41384c964ff56b914883c9c7449d8351cd116d2c5da3431",
+      "protected": false
+    },
+    {
+      "path": "docs/02_kernel.md",
+      "kind": "file",
+      "sha256": "sha256:f8db87d2be04241b85f321ec56b1c74d620edbe29436f263e5924e0f2ac129a9",
+      "protected": false
+    },
+    {
+      "path": "docs/03_defense_lines.md",
+      "kind": "file",
+      "sha256": "sha256:84ff93a243c1c18ace103ae6556b550eba76a1a251a4946b18f654468ed402ed",
+      "protected": false
+    },
+    {
+      "path": "docs/04_workspace_model.md",
+      "kind": "file",
+      "sha256": "sha256:892dfaadd9d108fbd883c386dd1008251e3602e88468e14795220b5adf1d4429",
+      "protected": false
+    },
+    {
+      "path": "docs/05_harness.md",
+      "kind": "file",
+      "sha256": "sha256:a630289be6f758e399c514ec5df1614aba16a95d001945f85a6995f324b1a52b",
+      "protected": false
+    },
+    {
+      "path": "docs/06_agent_architecture.md",
+      "kind": "file",
+      "sha256": "sha256:9267a417cd96030385409a5a8768b751d4360f7bb78ec0f1319104338a8cb370",
+      "protected": false
+    },
+    {
+      "path": "docs/glossary.md",
+      "kind": "file",
+      "sha256": "sha256:2ac217dfdc96e43c0ac9c5f53a59f3ae4b36bbb10ef91bb37135b08545e9767d",
+      "protected": false
+    },
+    {
+      "path": "HamesSystem_Public.md",
+      "kind": "file",
+      "sha256": "sha256:5078987228a9cce48f93b2899276f027ca6a3dd2f29b7d881735681d0a63bf56",
+      "protected": false
+    },
+    {
+      "path": "INSTALL.md",
+      "kind": "file",
+      "sha256": "sha256:33458aa368c13d4482e878cf5009ffc595c65f38d785e3051add2af8b87168d7",
+      "protected": false
+    },
+    {
+      "path": "LICENSE",
+      "kind": "file",
+      "sha256": "sha256:b09aa86590b63d1610d3f89fbe13f6a30bf33a0b52f5e97520a323a1e5f2837c",
+      "protected": false
+    },
+    {
+      "path": "README.md",
+      "kind": "file",
+      "sha256": "sha256:bcc761c97652431ce17085f5de88e86e4cfaa85a0d6cd7175b23332f376fd8c2",
+      "protected": false
+    },
+    {
+      "path": "scripts/init.ps1",
+      "kind": "file",
+      "sha256": "sha256:166aeb4114cb67fadab4d5b9a649a1d22a7f41a861e3fe88d1454c0bb8cf8d52",
+      "protected": false
+    },
+    {
+      "path": "scripts/init.sh",
+      "kind": "file",
+      "sha256": "sha256:5c6350d4646aee41b24ead9df409274a337c84b428f4ebae36ef0907087331b8",
+      "protected": false
+    },
+    {
+      "path": "scripts/verify_install.js",
+      "kind": "file",
+      "sha256": "sha256:598f80f193ebb772cb154ce47a236039e4e9d371ddd6ed9addf8b206cf82de4e",
+      "protected": false
+    },
+    {
+      "path": "SETUP_PROMPT.md",
+      "kind": "file",
+      "sha256": "sha256:60468eed92ff876b73fae99408c907843a667cbbb7f01c98114aba62dac38783",
+      "protected": false
+    },
+    {
+      "path": "workspaces/_scaffold/_Master/.gitkeep",
+      "kind": "file",
+      "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "protected": false
+    },
+    {
+      "path": "workspaces/_scaffold/CLAUDE.md.template",
+      "kind": "file",
+      "sha256": "sha256:b214013faa0d0e112cf5ea556f2f63123e586a46dfb185f926d72262966f2714",
+      "protected": false
+    },
+    {
+      "path": "workspaces/README.md",
+      "kind": "file",
+      "sha256": "sha256:3bbd80449918dc7bf34af02200f7c3199fe741d6a6049d44694c8ee1c5b7c2fa",
+      "protected": false
+    }
+  ],
+  "signatures": [
+    {
+      "path": "CLAUDE.md",
+      "sha256": "sha256:66ae114506338e06b891d2868942fbe8530dfa6abf4abf259299d049adf137c3",
+      "kernel_marker": "HAMES SYSTEM KERNEL"
+    },
+    {
+      "path": "AGENTS.md",
+      "sha256": "sha256:35ea047f30293d2d3c72446725afaab235e34af85a57a6a24bec6abf2f2260b9"
+    },
+    {
+      "path": ".cursor/rules/harness_engineering.md",
+      "sha256": "sha256:52dd0adebe6b9bf7c214c03f60112520b20e0a41a8c532752d80f60f9d17b775"
+    },
+    {
+      "path": "arsenal/CLAUDE.md",
+      "sha256": "sha256:ed3579d1bcb414fa8d237716be652e48f34148687c4daa036fffe6b1483eeb70"
+    },
+    {
+      "path": "README.md",
+      "sha256": "sha256:bcc761c97652431ce17085f5de88e86e4cfaa85a0d6cd7175b23332f376fd8c2"
+    }
+  ],
+  "manifest_digest": "sha256:b60777e265f62cc4bddf5e3791898ce7aa8734f6c64fe144bd6d0dad55c0d772"
+}

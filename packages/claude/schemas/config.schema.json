@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/baek-labs/hames/schemas/config.schema.json",
+  "title": "Hames project configuration",
+  "type": "object",
+  "required": ["version", "project", "workspaces", "tracking", "guards", "features", "extensions"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+    "project": {
+      "type": "object",
+      "required": ["name", "root"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "root": { "const": "." }
+      }
+    },
+    "workspaces": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "tracking": {
+      "type": "object",
+      "required": ["contracts"],
+      "additionalProperties": false,
+      "properties": { "contracts": { "enum": ["tracked", "untracked"] } }
+    },
+    "guards": {
+      "type": "object",
+      "required": ["enabled", "critical_actions"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "const": true },
+        "critical_actions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "features": {
+      "type": "array",
+      "items": { "enum": ["setup", "ready", "go", "doctor"] },
+      "allOf": [
+        { "contains": { "const": "setup" } },
+        { "contains": { "const": "ready" } },
+        { "contains": { "const": "go" } },
+        { "contains": { "const": "doctor" } }
+      ],
+      "uniqueItems": true
+    },
+    "extensions": { "type": "object", "additionalProperties": { "type": "object" } }
+  }
+}

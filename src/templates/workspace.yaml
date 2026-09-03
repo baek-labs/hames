@@ -1,0 +1,5 @@
+version: 1
+id: {{WORKSPACE_ID_JSON}}
+path: {{WORKSPACE_PATH_JSON}}
+context: [".hames/context/project.md"]
+protect: [".hames/config.yaml", {{WORKSPACE_CONFIG_JSON}}]

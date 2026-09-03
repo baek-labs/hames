@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "first_commit": "e79ec568e38cc1820045d5b2969ad3ff9e942d62",
+  "last_commit": "3f2d2db7554cf80966a81df91539225b4f87dd43",
+  "manifests": [
+    "public-main-01.json",
+    "public-main-02.json",
+    "public-main-03.json",
+    "public-main-04.json",
+    "public-main-05.json",
+    "public-main-06.json",
+    "public-main-07.json",
+    "public-main-08.json",
+    "public-main-09.json"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "hames",
+  "version": "2.0.0",
+  "description": "A workspace-first harness for approved, evidence-backed agent work",
+  "author": {
+    "name": "Baek Labs",
+    "url": "https://github.com/baek-labs"
+  },
+  "homepage": "https://github.com/baek-labs/hames",
+  "repository": "https://github.com/baek-labs/hames",
+  "license": "MIT",
+  "keywords": ["agents", "harness", "contracts", "verification"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Hames",
+    "shortDescription": "Approve agent work and verify it with evidence.",
+    "longDescription": "Configure a project, approve bounded work, guard execution, and verify completion with observable evidence.",
+    "developerName": "Baek Labs",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Write"],
+    "websiteURL": "https://github.com/baek-labs/hames",
+    "defaultPrompt": [
+      "Set up Hames in this project.",
+      "Prepare this task for approval.",
+      "Check whether Hames is configured correctly."
+    ],
+    "brandColor": "#171717"
+  }
+}

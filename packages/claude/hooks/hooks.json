@@ -1,0 +1,43 @@
+{
+  "description": "Hames project-scope and evidence hooks.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/context-loader.js\"",
+            "timeout": 10,
+            "statusMessage": "Loading Hames project context"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/scope-guard.js\"",
+            "timeout": 10,
+            "statusMessage": "Checking Hames contract scope"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/evidence-guard.js\"",
+            "timeout": 10,
+            "statusMessage": "Recording Hames evidence metadata"
+          }
+        ]
+      }
+    ]
+  }
+}

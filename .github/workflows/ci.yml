@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify committed packages
+        run: node scripts/verify.mjs
+      - name: Test
+        run: node --test
+      - name: Build packages
+        run: node scripts/build.mjs
+      - name: Verify packages
+        run: node scripts/verify.mjs
+      - name: Confirm build produced no tracked package drift
+        run: git diff --exit-code -- packages

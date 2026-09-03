@@ -1,111 +1,94 @@
-# hames
+# Hames
 
-> **Workspace-first orchestration for multi-model AI workflows.**
+Hames is a workspace-first, general-purpose harness for AI agents. It separates what a user approves from how an agent implements it, guards the approved boundary, and uses observable evidence to decide whether work is complete.
 
-A strategic operating system for AI engineers running a personal stack of agents across Claude Code, Codex, and Gemini CLI. Production-grade safety guarantees backed by hooks, not exhortations.
+Hames handles code, documents, browser work, and external service operations through the same `setup → ready → go` flow.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/status-actively%20maintained-brightgreen)](#status)
-[![Version](https://img.shields.io/badge/version-v1.1-green)](CHANGELOG.md)
+## How it works
 
-> **Hames is workspace-first, not agent-first.** Its primary unit is the workspace, not the tool call. This separates Hames from typical agent harnesses, which center on tool execution.
->
-> ⚠️ **This is a starting template, not a finished product.** The default workspaces, agent roles, and slash commands are intentional examples — fork and replace them with your own domain.
+1. Install the Hames plugin for your agent host.
+2. Open the target project and run `/setup`.
+3. Review the proposed project files and approve the exact changes.
+4. Run `/ready` to define and approve one task contract.
+5. Run `/go <task-id>` to execute that contract.
+6. Review the evidence and accept the result; Hames then archives the contract.
 
----
+Installing the Hames plugin adds the skills and hooks to the host. `/setup` is a separate step that configures the current project. It does not copy skill files into the project.
 
-## 🚀 The Lazy Way (let your AI set it up)
+## Install
 
-Open Claude Code, Codex CLI, or Gemini CLI in any directory and paste:
+### Codex
 
-> Set up Hames for me. Read [`SETUP_PROMPT.md`](https://raw.githubusercontent.com/baek-labs/hames/main/SETUP_PROMPT.md) and follow it step by step. Stop and ask me if anything fails.
+Add this repository as a marketplace source:
 
-Your AI will: clone the repo, run the platform-appropriate installer, render personalization tokens, run the 30-assertion verifier, and tell you when it's done. Total: ~3 minutes of mostly-watching.
-
-If you'd rather drive manually, see the [Quickstart](#quickstart) section below.
-
----
-
-## Why
-
-A typical AI engineer in 2026 runs three model clients, several work domains, and a dozen integrations. Without a coordinating layer:
-
-- Rules drift across clients
-- Work leaks across domains
-- Safety conventions erode under context pressure
-
-Hames addresses these directly with **workspace-first execution**, **defense lines backed by hooks**, and **a router-not-executor agent architecture**.
-
----
-
-## Quickstart
-
-### Windows
-```powershell
-git clone https://github.com/baek-labs/hames.git
-cd hames
-powershell -ExecutionPolicy Bypass -File scripts/init.ps1
+```sh
+codex plugin marketplace add baek-labs/hames --ref main
 ```
 
-### macOS / Linux
-```bash
-git clone https://github.com/baek-labs/hames.git
-cd hames
-bash scripts/init.sh
+Restart the Codex app, select the Baek Labs source in the Plugins Directory, and install Hames. Review and trust the bundled hooks before expecting them to run.
+
+### Claude Code
+
+Inside Claude Code:
+
+```text
+/plugin marketplace add baek-labs/hames
+/plugin install hames@baek-labs
 ```
 
-### GitHub Codespaces
+Restart Claude Code after installation so its skills and hooks are rediscovered.
 
-Click **"Open in Codespaces"**. The `.devcontainer/` configuration installs Claude / Codex / Gemini CLIs and runs setup automatically.
+Codex and Claude Code are the first supported hosts. Other hosts are not officially supported by this release; see [host support](docs/host-support.md).
 
-See [`INSTALL.md`](INSTALL.md) for the full SOP, troubleshooting, and AI-client integration steps.
+## Core commands
 
-The installer personalizes a few framework files with your local path and operator name, then marks those rendered files as local-only so `git status` stays clean. If you later fork Hames to develop the framework itself, see the reset notes in [`INSTALL.md`](INSTALL.md).
-
----
-
-## What you get
-
-- **Six core rule modules** — kernel, prompt, context, agent, harness, enforcement. Loaded automatically across Claude Code, Codex, Cursor, and Gemini CLI.
-- **Four defense lines** — text-level instruction → first-response confirmation → PreToolUse hook → wrapper-script pre-injection.
-- **Workspace-first routing** — execution flows `Task → COO → Workspace → Agent → Harness`, not the other way around.
-- **Two-tier agent architecture** — five Level-1 domain agents (CFO, CSO, CBO, CTO, Marketer) each with specialized Level-2 sub-teams (analyst → planner, writer → auditor, architect → coder → reviewer, etc.).
-- **AI_COMM** — model-to-model handoff buffer for Claude ↔ Codex ↔ Gemini continuity.
-- **Hook-enforced safety** — overwrite blocking, surgical-edit enforcement, workspace lock, frontmatter validation, dangerous-Bash gating.
-
----
-
-## Documentation
-
-| Doc | What it covers |
+| Command | Purpose |
 |---|---|
-| [`docs/01_philosophy.md`](docs/01_philosophy.md) | Why Hames exists, design principles, who it's for |
-| [`docs/02_kernel.md`](docs/02_kernel.md) | Kernel anatomy, the five rule modules, fork-safe sections |
-| [`docs/03_defense_lines.md`](docs/03_defense_lines.md) | Threat model and the four-layer enforcement system |
-| [`docs/04_workspace_model.md`](docs/04_workspace_model.md) | Workspaces, frontmatter, isolated-domain pattern |
-| [`docs/05_harness.md`](docs/05_harness.md) | Every hook, when it fires, when to bypass |
-| [`docs/06_agent_architecture.md`](docs/06_agent_architecture.md) | COO routing, Level-1/2 spawn protocol, AI_COMM |
-| [`docs/glossary.md`](docs/glossary.md) | Term definitions |
-| [`CHANGELOG.md`](CHANGELOG.md) | Version history |
+| `/setup` | Preview, approve, apply, and diagnose project-level Hames configuration. |
+| `/ready` | Turn user intent into a bounded, evidence-aware contract and obtain approval. |
+| `/go` | Activate one approved contract, execute it, verify evidence, obtain acceptance, and archive it. |
+| `/doctor` | Inspect plugin, project, contract, and session health without changing anything. |
 
----
+`/ready` approval and `/go` do not authorize a critical action. Hames asks again immediately before deletion, sending, publication, deployment, payment, permission changes, or impactful external-service mutations.
 
-## Status
+## Project files
 
-**Actively maintained reference implementation.** Updated periodically as the system evolves — see [CHANGELOG.md](CHANGELOG.md) for version history. Issues and PRs may not be actively monitored — Hames is fork-first. Fork freely (MIT License).
+`/setup` proposes this project-owned structure:
 
-The rules and harness improve over time. You fork your own copy and pull upstream changes when they're useful; there is no forced migration. Extend by forking.
+```text
+.hames/
+├── config.yaml
+├── workspaces/default.yaml
+├── context/project.md
+├── contracts/active/
+├── contracts/archive/
+└── state/
+```
 
----
+Existing `AGENTS.md` and `CLAUDE.md` files are preserved. Hames adds only a clearly marked boundary block after showing the diff and receiving approval. `.hames/state/` is always excluded from Git; tracking of `.hames/contracts/` is the user's choice.
+
+If `/setup` recognizes a previously distributed public Hames folder, it offers a same-folder transition. Checked-in legacy manifests identify unchanged system files; modified, user-owned, protected, unknown, and submodule content stays in place. Workspace paths are never moved or inferred from folder names, and ambiguous registrations wait for confirmation. See [project setup and legacy transition](docs/setup.md).
+
+## Safety boundary
+
+The file guard rejects project escape through absolute paths, `..`, or symlinks and checks the active contract hash. Shell inspection is best-effort, and unstructured browser or UI work cannot be made safe by a path hook alone. External changes require observable pre-state, action, and post-state evidence unless the user approves a documented exception.
+
+See [architecture](docs/architecture.md), [safety](docs/safety.md), [extensions](docs/extensions.md), and [development](docs/development.md).
+
+## Scope
+
+Hames Core provides only `/setup`, `/ready`, `/go`, and `/doctor`. It does not include fixed personas, fixed workspaces, personal service integrations, model handoff systems, or Git/content/team packs. Extension points are documented, but optional packs are not implemented in Core.
+
+## Development
+
+```sh
+node --test
+node scripts/build.mjs
+node scripts/verify.mjs
+```
+
+Edit `src/`, not `packages/`. The generated `packages/codex` and `packages/claude` directories are committed distribution artifacts and must exactly match the source build.
 
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
----
-
-## Acknowledgements
-
-Built on top of (and grateful to) Claude Code, Codex CLI, Gemini CLI, Cursor, and the broader AI engineering community whose conventions Hames operationalizes.
-
-The `hames-local` plugin includes a Hames-aware fork of upstream Claude Code plugins. See [arsenal/plugins/hames-local/](arsenal/plugins/hames-local/) for upstream attribution.

@@ -1,0 +1,13 @@
+{
+  "name": "hames",
+  "version": "2.0.0",
+  "description": "A workspace-first harness for approved, evidence-backed agent work",
+  "author": {
+    "name": "Baek Labs",
+    "url": "https://github.com/baek-labs"
+  },
+  "homepage": "https://github.com/baek-labs/hames",
+  "repository": "https://github.com/baek-labs/hames",
+  "license": "MIT",
+  "keywords": ["agents", "harness", "contracts", "verification"]
+}

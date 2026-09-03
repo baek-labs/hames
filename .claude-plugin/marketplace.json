@@ -1,0 +1,15 @@
+{
+  "name": "baek-labs",
+  "owner": {
+    "name": "Baek Labs"
+  },
+  "description": "Installable Hames agent harness plugins from Baek Labs",
+  "plugins": [
+    {
+      "name": "hames",
+      "source": "./packages/claude",
+      "description": "A workspace-first harness for approved, evidence-backed agent work",
+      "version": "2.0.0"
+    }
+  ]
+}

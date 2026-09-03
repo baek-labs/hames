@@ -1,0 +1,4 @@
+# HAMES:START
+.hames/state/
+{{CONTRACTS_IGNORE}}
+# HAMES:END
