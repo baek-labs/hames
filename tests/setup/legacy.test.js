@@ -97,6 +97,20 @@ test("history-free detection requires a kernel marker and multiple matching sign
   assert.equal(detectLegacy(weak, { manifestRoot: DEFAULT_MANIFEST_ROOT }).matched, false);
 });
 
+test("legacy signatures and original files tolerate Windows line endings", () => {
+  const manifest = loadManifests(DEFAULT_MANIFEST_ROOT).find((item) => item.commits.includes(LAST_LEGACY_COMMIT));
+  const root = noGitFixture(manifest, ["AGENTS.md", "CLAUDE.md"]);
+  for (const relative of manifest.signatures.map((item) => item.path)) {
+    const file = path.join(root, relative);
+    const content = fs.readFileSync(file, "utf8").replace(/\r?\n/g, "\r\n");
+    fs.writeFileSync(file, content);
+  }
+  const detected = detectLegacy(root, { manifestRoot: DEFAULT_MANIFEST_ROOT });
+  assert.equal(detected.basis, "signatures");
+  const plan = planLegacyTransition({ root, manifestRoot: DEFAULT_MANIFEST_ROOT, projectName: "Legacy", contractTracking: "tracked", workspaceDecisions: [] });
+  assert.ok(plan.cleanup.some((item) => item.path === "CLAUDE.md" && item.action === "replace_entry"));
+});
+
 test("the public /setup runtime automatically routes a detected legacy tree", () => {
   const manifest = loadManifests(DEFAULT_MANIFEST_ROOT).find((item) => item.commits.includes(LAST_LEGACY_COMMIT));
   const root = noGitFixture(manifest);

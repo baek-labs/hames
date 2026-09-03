@@ -128,7 +128,7 @@ test("setup preserves project-owned context and updates only managed boundary bl
   assert.doesNotMatch(entry.after, /old instructions/);
   applySetup(plan, { approved: true });
   assert.equal(fs.readFileSync(path.join(root, ".hames/context/project.md"), "utf8"), "# Durable user decision\n");
-  assert.equal(fs.statSync(agentsFile).mode & 0o777, 0o640);
+  if (process.platform !== "win32") assert.equal(fs.statSync(agentsFile).mode & 0o777, 0o640);
 });
 
 test("interrupted setup recovery rolls back only journaled operations", () => {

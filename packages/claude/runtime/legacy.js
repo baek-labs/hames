@@ -31,6 +31,14 @@ function digest(value) {
   return `sha256:${crypto.createHash("sha256").update(content).digest("hex")}`;
 }
 
+function matchesFileDigest(content, expected) {
+  if (digest(content) === expected) return true;
+  if (!Buffer.isBuffer(content) || content.includes(0)) return false;
+  const text = content.toString("utf8");
+  if (!Buffer.from(text, "utf8").equals(content)) return false;
+  return digest(Buffer.from(text.replace(/\r\n/g, "\n"), "utf8")) === expected;
+}
+
 function manifestDigest(manifest) {
   const copy = { ...manifest };
   delete copy.manifest_digest;
@@ -81,7 +89,7 @@ function signatureMatch(root, manifest) {
     const file = path.join(root, signature.path);
     if (!fs.existsSync(file) || isProtectedPath(signature.path) || !fs.lstatSync(file).isFile()) continue;
     const content = fs.readFileSync(file);
-    if (digest(content) === signature.sha256) matches += 1;
+    if (matchesFileDigest(content, signature.sha256)) matches += 1;
     if (signature.kernel_marker && content.toString("utf8").includes(signature.kernel_marker)) kernel = true;
   }
   return { matches, kernel };
@@ -165,8 +173,9 @@ function currentEntry(root, entry) {
     return { kind, matches: entry.kind === kind && digest(link) === entry.sha256, current_digest: digest(link), symlink_inside: inside, target_path_digest: digest(target) };
   }
   if (kind !== "file") return { kind, matches: false, current_digest: null };
-  const currentDigest = digest(fs.readFileSync(absolute));
-  return { kind, matches: entry.kind === "file" && currentDigest === entry.sha256, current_digest: currentDigest };
+  const content = fs.readFileSync(absolute);
+  const currentDigest = digest(content);
+  return { kind, matches: entry.kind === "file" && matchesFileDigest(content, entry.sha256), current_digest: currentDigest };
 }
 
 function legacyWorkspaceMappings(root, manifest) {
