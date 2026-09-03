@@ -110,11 +110,14 @@ test("full clones use nearest supported history while shallow clones require sig
   const parent = temporaryRoot();
   const full = path.join(parent, "full");
   assert.equal(spawnSync("git", ["clone", "--quiet", "--no-local", REPO, full]).status, 0);
+  assert.equal(spawnSync("git", ["-C", full, "checkout", "--quiet", LAST_LEGACY_COMMIT]).status, 0);
   assert.equal(spawnSync("git", ["-C", full, "remote", "set-url", "origin", "https://github.com/baek-labs/hames.git"]).status, 0);
   assert.equal(detectLegacy(full, { manifestRoot: DEFAULT_MANIFEST_ROOT }).basis, "git_history");
 
   const shallow = path.join(parent, "shallow");
-  assert.equal(spawnSync("git", ["clone", "--quiet", "--depth", "1", `file://${REPO}`, shallow]).status, 0);
+  assert.equal(spawnSync("git", ["clone", "--quiet", "--no-checkout", "--depth", "1", `file://${REPO}`, shallow]).status, 0);
+  assert.equal(spawnSync("git", ["-C", shallow, "fetch", "--quiet", "--depth", "1", "origin", LAST_LEGACY_COMMIT]).status, 0);
+  assert.equal(spawnSync("git", ["-C", shallow, "checkout", "--quiet", "FETCH_HEAD"]).status, 0);
   assert.equal(spawnSync("git", ["-C", shallow, "remote", "set-url", "origin", "https://github.com/baek-labs/hames.git"]).status, 0);
   assert.equal(detectLegacy(shallow, { manifestRoot: DEFAULT_MANIFEST_ROOT }).basis, "signatures");
 });

@@ -56,6 +56,7 @@ test("CI covers Linux, macOS, and Windows with the full local verifier", () => {
   assert.match(workflow, /node --test/);
   assert.match(workflow, /node scripts\/build\.mjs/);
   assert.match(workflow, /node scripts\/verify\.mjs/);
+  assert.match(workflow, /fetch-depth:\s*0/, "legacy manifest tests require the public Git history");
 });
 
 test("setup documentation explains safe same-folder legacy transition", () => {
