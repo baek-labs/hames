@@ -13,7 +13,7 @@ node scripts/verify.mjs
 git diff --check
 ```
 
-Run the build twice and compare the package tree when changing distribution logic. `scripts/verify.mjs` parses manifests and schemas, compares shared source files with both packages, and checks Core for prohibited fixed assumptions. CI runs it before rebuilding so stale committed packages fail, then rebuilds and requires `git diff --exit-code -- packages`.
+Run the build twice and compare the package tree when changing distribution logic. `scripts/verify.mjs` parses manifests and schemas, compares shared source files with both packages, and checks Core for prohibited fixed assumptions. This repository does not install a GitHub Actions workflow; maintainers run the release checks directly or add automation in their own distribution environment.
 
 ## Reliability boundaries
 

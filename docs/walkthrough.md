@@ -16,12 +16,12 @@
 - `node --test`: 자동화된 setup, contract, guard, distribution, documentation 검증을 실행한다.
 - `node scripts/build.mjs`: 두 생성 패키지를 정본에서 다시 만든다.
 - `node scripts/verify.mjs`: manifest·schema·hook·정본 일치·Core 명령 수·하드코딩 경계를 검사한다.
-- Codex 패키지는 공식 plugin validator를 통과했다.
+- Codex 패키지는 `scripts/verify.mjs`의 manifest·구조 검증을 통과했다.
 - Claude Code 패키지와 marketplace는 Claude CLI validator를 통과했다.
 
 ## 확인 근거와 제한
 
 - Claude Code의 일회성 `--plugin-dir` 로드에서 네 스킬과 세 훅이 발견됐고, 새 print 세션에서 네 Core 명령을 인식했다.
 - Codex CLI에는 전역 설정을 바꾸지 않는 일회성 로컬 플러그인 주입 경로가 확인되지 않았다. 패키지 검증은 통과했지만, 실제 Codex 새 세션 시험은 사용자 승인 후 로컬 marketplace 설치로 별도 확인해야 한다.
-- Linux·macOS·Windows CI 매트릭스를 추가했지만, 이 로컬 실행에서는 원격 CI 세 운영체제 결과가 아직 생성되지 않았다.
+- 공개 저장소에는 GitHub Actions workflow를 포함하지 않는다. 자동 검증은 로컬 release check로 제공한다.
 - 훅의 구조화된 파일·도구 입력은 기계 검사하지만, 셸 문자열과 구조화되지 않은 브라우저·UI 작업은 완전한 격리 환경이 아니라 best-effort 경계다.

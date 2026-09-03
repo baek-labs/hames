@@ -48,15 +48,8 @@ test("repository entry rules describe the generated-package boundary", () => {
   }
 });
 
-test("CI covers Linux, macOS, and Windows with the full local verifier", () => {
-  const workflow = read(".github/workflows/ci.yml");
-  assert.match(workflow, /ubuntu-latest/);
-  assert.match(workflow, /macos-latest/);
-  assert.match(workflow, /windows-latest/);
-  assert.match(workflow, /node --test/);
-  assert.match(workflow, /node scripts\/build\.mjs/);
-  assert.match(workflow, /node scripts\/verify\.mjs/);
-  assert.match(workflow, /fetch-depth:\s*0/, "legacy manifest tests require the public Git history");
+test("the distribution does not install a repository-owned CI workflow", () => {
+  assert.equal(fs.existsSync(path.join(ROOT, ".github/workflows/ci.yml")), false);
 });
 
 test("setup documentation explains safe same-folder legacy transition", () => {
