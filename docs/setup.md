@@ -2,6 +2,8 @@
 
 `/setup` runs after the Hames plugin is installed. It first performs a read-only inspection, then shows an exact plan. No project file is changed until the user approves that plan hash.
 
+Setup reuses valid configuration and choices already supplied by the user. It asks only for unresolved choices. A repeated setup with matching choices remains read-only and directs the user to `/ready`.
+
 ## New and existing projects
 
 For an ordinary project, Hames proposes `.hames/config.yaml`, workspace registrations, durable context, contract directories, Git exclusions, and bounded entry blocks for `AGENTS.md` and `CLAUDE.md`. Existing project-owned content is preserved. A changed file or setup choice produces a different plan hash and requires a new preview.

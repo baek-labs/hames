@@ -23,4 +23,4 @@ Run the build twice and compare the package tree when changing distribution logi
 
 ## Release check
 
-Automated tests cover new and existing project setup, non-Git projects, idempotence, damaged configuration, rollback, lifecycle transitions, three task types, path and symlink escape, tampering, evidence gaps, package determinism, and documentation. A release additionally requires fresh-session discovery and representative flows in both supported hosts.
+Automated tests cover new and existing project setup, non-Git projects, idempotence, damaged configuration, rollback, lifecycle transitions, same-session presentation approval, resumable dependency progress, proportional review, three task types, path and symlink escape, tampering, evidence gaps, package determinism, and documentation. A release additionally requires fresh-session discovery and representative flows in both supported hosts.

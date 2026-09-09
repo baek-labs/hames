@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 
+const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const { parseConfig, validateConfig } = require("./config.js");
@@ -161,13 +162,34 @@ function diagnose(root = process.cwd(), { pluginRoot = path.resolve(__dirname, "
         }
         try {
           const events = fs.readFileSync(path.join(directory, "events.jsonl"), "utf8").split(/\r?\n/).filter(Boolean).map(JSON.parse);
-          const lifecycle = events.filter((item) => ["created", "approved", "activated", "review_ready", "accepted", "archived", "amended"].includes(item.type));
+          const lifecycle = events.filter((item) => ["created", "presented", "approved", "activated", "resumed", "review_ready", "accepted", "archived", "amended"].includes(item.type));
           const aligned = lifecycle.length > 0 && lifecycle.at(-1).status === contract.status;
           checks.push(check(`events:${area}:${taskId}`, aligned ? "pass" : "fail", aligned ? "Latest lifecycle event matches contract status." : "Lifecycle event and contract status mismatch."));
           if (!aligned) recovery.push(`Review the interrupted state transition for ${taskId}.`);
         } catch (error) {
           checks.push(check(`events:${area}:${taskId}`, "fail", error.message));
           recovery.push(`Review unreadable lifecycle events for ${taskId}.`);
+        }
+        for (const [name, required] of [["progress.json", Boolean(contract.work_plan?.length)], ["review.json", Boolean(contract.review?.required)], ["knowledge.json", Boolean(contract.knowledge?.destinations?.length)]]) {
+          try {
+            const state = JSON.parse(fs.readFileSync(path.join(directory, name), "utf8"));
+            const linked = state.task_id === contract.task_id && state.revision === contract.revision && state.spec_hash === contract.spec_hash;
+            let status = linked ? "pass" : "fail";
+            let detail = linked ? "State matches the contract." : "State linkage mismatch.";
+            if (linked && name === "review.json") {
+              detail = contract.review?.required ? `Required review is ${state.status}.` : "Independent review is not required.";
+              if (contract.review?.required && state.status !== "passed") status = new Set(["REVIEW", "ACCEPTED", "ARCHIVED"]).has(contract.status) ? "fail" : "warn";
+            }
+            if (linked && name === "progress.json" && Object.values(state.steps || {}).some((step) => step.stop_required)) {
+              status = "warn";
+              detail = "A work step is stopped after repeated failure.";
+            }
+            checks.push(check(`${name.replace(".json", "")}:${area}:${taskId}`, status, detail));
+            if (!linked) recovery.push(`Recreate ${name} for ${taskId} through an approved contract amendment.`);
+          } catch (error) {
+            checks.push(check(`${name.replace(".json", "")}:${area}:${taskId}`, required ? "fail" : "warn", error.message));
+            if (required) recovery.push(`Recreate required ${name} for ${taskId} through an approved contract amendment.`);
+          }
         }
       } catch (error) {
         checks.push(check(`contract:${area}:${taskId}`, "fail", error.message));
@@ -178,9 +200,13 @@ function diagnose(root = process.cwd(), { pluginRoot = path.resolve(__dirname, "
 
   const sessions = path.join(projectRoot, ".hames/state/sessions");
   if (fs.existsSync(sessions)) {
+    const owners = new Map();
     for (const name of fs.readdirSync(sessions).filter((item) => item.endsWith(".json"))) {
       try {
         const pointer = JSON.parse(fs.readFileSync(path.join(sessions, name), "utf8"));
+        const expectedName = `${crypto.createHash("sha256").update(pointer.session_id || "").digest("hex")}.json`;
+        if (name !== expectedName) throw new Error("Session pointer filename does not match its session identity");
+        owners.set(pointer.task_id, (owners.get(pointer.task_id) || 0) + 1);
         const safeId = /^[a-z0-9][a-z0-9._-]{0,63}$/.test(pointer.task_id || "");
         const expectedPath = safeId ? `.hames/contracts/active/${pointer.task_id}` : null;
         if (!safeId || pointer.contract_path !== expectedPath || path.resolve(pointer.project_root || "") !== projectRoot) throw new Error("Session pointer project or contract path is invalid");
@@ -191,6 +217,12 @@ function diagnose(root = process.cwd(), { pluginRoot = path.resolve(__dirname, "
       } catch (error) {
         checks.push(check(`session:${name}`, "fail", error.message));
         recovery.push(`Review unreadable session pointer ${name}; do not clear it automatically.`);
+      }
+    }
+    for (const [taskId, count] of owners) {
+      if (count > 1) {
+        checks.push(check(`session-owner:${taskId}`, "fail", `Contract has ${count} session owners.`));
+        recovery.push(`Resolve duplicate session ownership for ${taskId} before resuming.`);
       }
     }
   }

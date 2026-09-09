@@ -3,8 +3,8 @@
 Hames connects four responsibilities that are often left as prompt conventions:
 
 1. `/setup` configures a project without owning the project itself.
-2. `/ready` separates user intent from implementation and records the approved boundary.
-3. `/go` binds one session to one approved contract and collects required evidence.
+2. `/ready` separates user intent from implementation, presents a readable contract, and records its work order, review policy, and durable-knowledge destinations.
+3. `/go` approves the exact contract just presented in the same session, binds execution to it, records dependency-aware progress, and collects required evidence.
 4. Hooks check what they can observe before and after tool use; `/doctor` diagnoses drift without changing it.
 
 ## Source and distribution
@@ -37,6 +37,8 @@ DRAFT → READY → ACTIVE → REVIEW → ACCEPTED → ARCHIVED
 
 `contract.json` is authoritative. `contract.md` is generated for human approval. `events.jsonl` records transitions, `evidence.json` stores safe metadata, and `result.md` maps requirements to artifacts and limitations.
 
+`progress.json` records work-step state and repeated failure points without changing the approved specification. `review.json` binds one safe independent-review checklist to the completed progress, evidence, and reviewed artifact digests. `knowledge.json` records whether approved durable destinations were applied or deferred. A presentation is tied to its session, revision, specification hash, and rendered digest; `/go` may approve it directly only from that same session.
+
 ## Concurrency and recovery
 
-A session can bind to only one active contract, and a contract cannot be active in two sessions. Revision, specification hash, project root, and contract path are repeated in the session pointer so drift can be detected. Mismatched or interrupted state is never cleared automatically; `/doctor` presents recovery choices.
+A session can bind to only one active contract, and a contract cannot be active in two sessions. The same session can resume its valid active contract from recorded progress. A different session requires a confirmed handoff after the prior session ended or yielded safely. Revision, specification hash, project root, and contract path remain repeated in the session pointer.

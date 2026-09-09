@@ -14,4 +14,4 @@ The generated package uses `.claude-plugin/plugin.json`, `skills/`, and `hooks/h
 
 Grok Build, Gemini CLI, Antigravity, Cursor, and other hosts are not officially supported. A host reading some Claude-compatible files is not sufficient evidence of compatibility. Each future host needs manifest discovery, skill discovery, hook lifecycle, blocking output, session identity, and representative workflow tests.
 
-Automated package tests do not replace a fresh-session host test. Before release, verify that `/setup`, `/ready`, `/go`, and `/doctor` are discoverable in new Codex and Claude Code sessions and that representative project flows reach the expected hook and state transitions.
+Automated package tests do not replace a fresh-session host test. Before release, verify that `/setup`, `/ready`, `/go`, and `/doctor` are discoverable in new Codex and Claude Code sessions. Confirm that a same-session `/go` activates the contract just shown without another approval, dependency progress resumes, required review blocks completion, and representative file and mock external-service flows reach the expected hook and state transitions.

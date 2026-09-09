@@ -9,8 +9,8 @@ Hames handles code, documents, browser work, and external service operations thr
 1. Install the Hames plugin for your agent host.
 2. Open the target project and run `/setup`.
 3. Review the proposed project files and approve the exact changes.
-4. Run `/ready` to define and approve one task contract.
-5. Run `/go <task-id>` to execute that contract.
+4. Run `/ready` to define and review one task contract.
+5. Run `/go` in that conversation to approve and execute the exact contract just shown.
 6. Review the evidence and accept the result; Hames then archives the contract.
 
 Installing the Hames plugin adds the skills and hooks to the host. `/setup` is a separate step that configures the current project. It does not copy skill files into the project.
@@ -45,11 +45,11 @@ Codex and Claude Code are the first supported hosts. Other hosts are not officia
 | Command | Purpose |
 |---|---|
 | `/setup` | Preview, approve, apply, and diagnose project-level Hames configuration. |
-| `/ready` | Turn user intent into a bounded, evidence-aware contract and obtain approval. |
-| `/go` | Activate one approved contract, execute it, verify evidence, obtain acceptance, and archive it. |
+| `/ready` | Turn user intent into a readable contract with outputs, work order, review policy, and evidence. |
+| `/go` | Approve the contract just shown, execute it in dependency order, verify it, obtain acceptance, and archive it. |
 | `/doctor` | Inspect plugin, project, contract, and session health without changing anything. |
 
-`/ready` approval and `/go` do not authorize a critical action. Hames asks again immediately before deletion, sending, publication, deployment, payment, permission changes, or impactful external-service mutations.
+`/go` approval does not authorize a critical action. Hames asks again immediately before deletion, sending, publication, deployment, payment, permission changes, or impactful external-service mutations.
 
 ## Project files
 

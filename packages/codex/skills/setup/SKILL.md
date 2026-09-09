@@ -7,6 +7,8 @@ description: Configure or diagnose Hames in the current project when the user in
 
 Inspect the current project and use the bundled setup runtime. Show every proposed file change and wait for explicit approval before applying it.
 
+Reuse valid existing configuration and choices already supplied by the user. Ask only for choices that remain unresolved. If setup is already valid and the requested choices match it, keep the run read-only, report that state, and point to `/ready`.
+
 Do not copy plugin skills into the project. Ask whether contracts should be Git-tracked; never infer that choice.
 
 Preserve existing `AGENTS.md` and `CLAUDE.md`; propose only the bounded Hames block. A valid repeated setup is read-only.

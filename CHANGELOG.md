@@ -2,6 +2,15 @@
 
 Notable Hames changes are recorded here.
 
+## Unreleased
+
+### Changed
+
+- Same-session `/go` now approves and activates the exact contract just presented without a repeated task ID or approval prompt.
+- Contracts can carry dependency-aware work plans, proportional independent-review policy, and approved durable-knowledge destinations.
+- Active work can resume in the same session, while cross-session handoff requires explicit confirmation that the previous session ended or yielded safely.
+- Human contract displays lead with goal, scope, outputs, work order, review policy, and acceptance criteria before the machine specification.
+
 ## [2.0.0] - 2026-09-03
 
 ### Added

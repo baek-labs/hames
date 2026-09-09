@@ -8,7 +8,7 @@ Interrupted setup recovery is also preview-first. Hames validates the journal sc
 
 ## Specification integrity
 
-The specification hash covers the task ID, project identifier, goal, targets, actions, allowed and denied scope, outputs, invariants, acceptance criteria, evidence requirements, exceptions, and risk. Object keys are sorted, array order is preserved, and relative paths are normalized. Lifecycle state, timestamps, approval, events, evidence, and results do not affect the hash.
+The specification hash covers the task ID, project identifier, goal, targets, actions, allowed and denied scope, outputs, invariants, acceptance criteria, evidence requirements, risk, work plan, review policy, durable-knowledge destinations, and exceptions. Object keys are sorted, array order is preserved, and relative paths are normalized. Lifecycle state, timestamps, presentation, approval, events, progress, review results, evidence, and results do not affect the hash.
 
 Changing the specification increments the revision and invalidates approval, evidence, and session pointers. Execution cannot continue until the revised contract is approved and activated again.
 
@@ -22,7 +22,7 @@ Shell inspection is best-effort. A command string is not a complete sandbox, and
 
 Deletion, destructive overwrite, sending, publication, deployment, payment, permission or security changes, and impactful external mutations remain critical. A project may add more critical actions but cannot weaken these defaults.
 
-Contract approval and `/go` do not authorize a critical action. Immediately before execution, Hames must show the target, action, and expected impact and receive a short-lived, single-use confirmation tied to the active session, target, action, revision, and specification hash.
+`/go` may approve only the exact contract presented in the same session. That approval does not authorize a critical action. Immediately before execution, Hames must show the target, action, and expected impact and receive a short-lived, single-use confirmation tied to the active session, target, action, revision, and specification hash.
 
 ## Evidence
 
@@ -33,3 +33,9 @@ Each evidence requirement includes a machine predicate. The post-tool hook deriv
 External tools do not need Hames-specific fields in their schemas. Before execution, Hames uniquely matches the tool provider, observed action kind, and real resource ID—or a create operation's parent, name, and resource type—to the active contract. The same pending match links the observed post-tool response to the next unmet before, action, or after evidence requirement. Zero or multiple matches stop the operation.
 
 `REVIEW` requires every declared evidence item to pass and a complete requirement-to-output mapping. Evidence and execution are frozen in `REVIEW`; acceptance rechecks the evidence linkage and the result document digest. Technical evidence never grants user acceptance.
+
+## Work order, review, and durable knowledge
+
+Contracts with meaningful dependencies record numbered work steps. Hames does not start a step until its dependencies complete, records repeated failure points, and stops a step after three failures at the same point. Behavior, API, permission, data-processing, external-state, and complex judgment-heavy changes require one independent review of the approved specification against completed work, current evidence, and reviewed artifact digests. Simple reversible changes use direct verification.
+
+Durable project knowledge is written only to destinations approved by the contract. A useful discovery outside that approved meaning or location is proposed before any write. This does not authorize changes to an agent host's private memory.
