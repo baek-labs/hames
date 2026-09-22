@@ -9,34 +9,9 @@ const { findProjectRoot } = require("./scope-guard.js");
 
 function loadContext(event) {
   const root = findProjectRoot(event.cwd);
-  if (!root) return { loaded: false, reason: "hames_not_configured" };
-  try {
-    const config = parseConfig(fs.readFileSync(path.join(root, ".hames/config.yaml"), "utf8"));
-    const validation = validateConfig(config);
-    if (!validation.valid) return { loaded: false, reason: `invalid_config: ${validation.errors.join("; ")}` };
-    const contextFile = path.join(root, ".hames/context/project.md");
-    const durableContext = fs.existsSync(contextFile) ? fs.readFileSync(contextFile, "utf8").slice(0, 5000) : "";
-    let active = "No task contract is linked to this session.";
-    if (event.session_id) {
-      const name = crypto.createHash("sha256").update(event.session_id).digest("hex");
-      const pointerFile = path.join(root, ".hames/state/sessions", `${name}.json`);
-      if (fs.existsSync(pointerFile)) {
-        const pointer = JSON.parse(fs.readFileSync(pointerFile, "utf8"));
-        active = `Session contract: ${pointer.task_id} revision ${pointer.revision}, hash ${pointer.spec_hash}.`;
-      }
-    }
-    const text = [
-      "Hames project context",
-      `Project: ${config.project.name}`,
-      `Workspaces: ${config.workspaces.join(", ")}`,
-      `Guards: ${config.guards.enabled ? "enabled" : "disabled"}`,
-      active,
-      durableContext,
-    ].filter(Boolean).join("\n");
-    return { loaded: true, context: text };
-  } catch (error) {
-    return { loaded: false, reason: error.message };
-  }
+  if (!root) return { loaded:true, onboarding:true, context:"Hames first use: this folder is not configured. Start the setup conversation: confirm the intended AI work root, ask what workspace folders and roles the user wants, offer editable examples one decision at a time, then show the full preview before writing. Do not create default folders silently. If the user declines setup, do not keep asking in this conversation. Use the Hames setup skill. Hames includes its execution workflows; no separate DryForge installation or Git initialization is required." };
+  try { return require("../runtime/context.js").selectContext(root, {cwd:event.cwd,sessionId:event.session_id,workspace:event.workspace}); }
+  catch(error) {return {loaded:false,reason:error.message};}
 }
 
 function readStdin() {

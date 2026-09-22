@@ -37,7 +37,7 @@ async function releaseLock() {
 }
 
 async function copyCommon(destination) {
-  for (const name of ["skills", "hooks", "runtime", "schemas", "templates", "legacy"]) {
+  for (const name of ["skills", "hooks", "runtime", "schemas", "templates", "legacy", "integrations"]) {
     await fs.cp(path.join(ROOT, "src", name), path.join(destination, name), {
       recursive: true,
       force: true,

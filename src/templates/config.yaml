@@ -1,4 +1,4 @@
-version: 1
+version: 2
 project:
   name: {{PROJECT_NAME_JSON}}
   root: "."
@@ -7,6 +7,8 @@ tracking:
   contracts: {{CONTRACT_TRACKING_JSON}}
 guards:
   enabled: true
-  critical_actions: ["delete", "destructive_overwrite", "send", "publish", "deploy", "payment", "permission_change", "external_mutation"]
-features: ["setup", "ready", "go", "doctor"]
+  critical_actions: {{CRITICAL_ACTIONS_JSON}}
+features: {{FEATURES_JSON}}
 extensions: {}
+documents: {{DOCUMENTS_JSON}}
+exclude: {{EXCLUDE_JSON}}

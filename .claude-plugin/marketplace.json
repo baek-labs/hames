@@ -8,8 +8,8 @@
     {
       "name": "hames",
       "source": "./packages/claude",
-      "description": "A workspace-first harness for approved, evidence-backed agent work",
-      "version": "2.0.0"
+      "description": "A user-shaped AI workspace with automatic indexes and built-in workflows",
+      "version": "3.0.0"
     }
   ]
 }

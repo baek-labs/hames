@@ -1,41 +1,11 @@
-# Safety model
+# Safety and preservation
 
-Hames treats approval, execution, evidence, and acceptance as separate decisions.
+Setup changes only the approved preview. Existing entries and indexes retain manual content. Changed preview data, conflicting configuration, corrupt management markers and unsupported versions stop automatic replacement. Recovery restores only the operation's own content, never newer user edits.
 
-`/setup` previews carry a digest of the exact project root and proposed operations. Apply requires that same digest, so a project change between preview and approval produces a new preview instead of silently applying a different plan.
+Structured file paths must remain within the selected root; lexical traversal and symlink escape are rejected. Configured placement and naming checks apply even without an active task contract. Semantic classification and missing/unreadable content remain explicit judgment or verification gaps.
 
-Interrupted setup recovery is also preview-first. Hames validates the journal schema, canonical managed paths, project root, plan digest, and current file contents; rollback requires the exact recovery digest and a new explicit approval.
+Within task execution, before, action and after evidence is required for external changes unless the contract records an explicit reasoned exception. The presented specification hash and session bind approval; a contract from another session is never silently selected. Required review and evidence must pass before acceptance.
 
-## Specification integrity
+Deletion, destructive replacement, sending, publication, deployment, payment and permission changes require authorization for that action. Ordinary work never implies Git initialization, commit, branch creation or push.
 
-The specification hash covers the task ID, project identifier, goal, targets, actions, allowed and denied scope, outputs, invariants, acceptance criteria, evidence requirements, risk, work plan, review policy, durable-knowledge destinations, and exceptions. Object keys are sorted, array order is preserved, and relative paths are normalized. Lifecycle state, timestamps, presentation, approval, events, progress, review results, evidence, and results do not affect the hash.
-
-Changing the specification increments the revision and invalidates approval, evidence, and session pointers. Execution cannot continue until the revised contract is approved and activated again.
-
-## File boundary
-
-The file guard compares write targets with the project root, denied patterns, approved patterns, and declared file targets. It rejects absolute or `..` escape and resolves existing ancestors so a symlink cannot carry a new file outside the project.
-
-Shell inspection is best-effort. A command string is not a complete sandbox, and some tools or UI interactions do not expose a structure that a hook can confidently classify. Hames only claims mechanical enforcement when the hook input identifies the target and action or exposes a concrete file path.
-
-## Critical actions
-
-Deletion, destructive overwrite, sending, publication, deployment, payment, permission or security changes, and impactful external mutations remain critical. A project may add more critical actions but cannot weaken these defaults.
-
-`/go` may approve only the exact contract presented in the same session. That approval does not authorize a critical action. Immediately before execution, Hames must show the target, action, and expected impact and receive a short-lived, single-use confirmation tied to the active session, target, action, revision, and specification hash.
-
-## Evidence
-
-External changes normally require three observations: before, action, and after. A reduced set is allowed only when the contract states why a pre-state is unavailable and records explicit user approval for the exception. If the result cannot be read back, the action is not reported as successful.
-
-Each evidence requirement includes a machine predicate. The post-tool hook derives pass/fail, exit or service status, matched fields, and output digest from the observed tool response; caller-supplied pass flags, assertions, and digests are ignored. External phases are ordered and their resource identifiers must remain consistent. Stored evidence contains only time, target and action IDs, method, derived status, digest, and minimal safe summaries. API keys, passwords, authentication tokens, raw messages, unnecessary personal data, and full tool output are excluded.
-
-External tools do not need Hames-specific fields in their schemas. Before execution, Hames uniquely matches the tool provider, observed action kind, and real resource ID—or a create operation's parent, name, and resource type—to the active contract. The same pending match links the observed post-tool response to the next unmet before, action, or after evidence requirement. Zero or multiple matches stop the operation.
-
-`REVIEW` requires every declared evidence item to pass and a complete requirement-to-output mapping. Evidence and execution are frozen in `REVIEW`; acceptance rechecks the evidence linkage and the result document digest. Technical evidence never grants user acceptance.
-
-## Work order, review, and durable knowledge
-
-Contracts with meaningful dependencies record numbered work steps. Hames does not start a step until its dependencies complete, records repeated failure points, and stops a step after three failures at the same point. Behavior, API, permission, data-processing, external-state, and complex judgment-heavy changes require one independent review of the approved specification against completed work, current evidence, and reviewed artifact digests. Simple reversible changes use direct verification.
-
-Durable project knowledge is written only to destinations approved by the contract. A useful discovery outside that approved meaning or location is proposed before any write. This does not authorize changes to an agent host's private memory.
+Shell inspection and unstructured browser/UI enforcement are best-effort. Hooks are not an OS sandbox. No watcher observes arbitrary external-app writes: use `/index` afterward. A failed automatic index update preserves the original file and reports pending maintenance. Secret values and raw private content do not belong in metadata or evidence logs.

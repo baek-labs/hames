@@ -96,6 +96,17 @@ function inferredKind(event, resolvedPath = null) {
   if (name === "write") return resolvedPath && fs.existsSync(resolvedPath) ? "update" : "create";
   if (new Set(["edit", "multiedit", "notebookedit"]).has(name)) return "update";
   if (name === "apply_patch") {
+    if (resolvedPath) {
+      const segments = command.split(/(?=^\*\*\* (?:Add|Update|Delete) File:)/m);
+      for (const segment of segments) {
+        const header = segment.match(/^\*\*\* (Add|Update|Delete) File: (.+)$/m);
+        if (!header) continue;
+        const move = segment.match(/^\*\*\* Move to: (.+)$/m);
+        const base = event.tool_input?.cwd || event.cwd || process.cwd();
+        if (move && path.resolve(base, move[1].trim()) === resolvedPath) return "create";
+        if (path.resolve(base, header[2].trim()) === resolvedPath) return move || header[1] === "Delete" ? "delete" : header[1] === "Add" ? "create" : "update";
+      }
+    }
     if (/^\*\*\* Delete File:/m.test(command)) return "delete";
     if (/^\*\*\* Add File:/m.test(command)) return "create";
     return "update";
@@ -223,10 +234,29 @@ function deny(reason) {
 function guardToolUse(event) {
   const root = findProjectRoot(event.cwd);
   if (!root) return { allowed: true, reason: "hames_not_configured" };
+  try {
+    const { loadProject } = require("../runtime/workspace.js");
+    const { checkFile } = require("../runtime/rules.js");
+    const project = loadProject(root);
+    if (project.config.version >= 2) {
+      for (const candidate of toolPaths(event)) {
+        const absolute = path.resolve(event.tool_input?.cwd || event.cwd || root, candidate);
+        const kind = inferredKind(event, absolute);
+        if (!kind || kind === "read") continue;
+        const resolved = resolveInsideRoot(root, absolute);
+        if (kind === "delete") continue;
+        const violations = checkFile(project, resolved.relative, { content: event.tool_input?.content, prewrite: true }).filter(i => i.status === "violation");
+        if (violations.length) return deny(violations.map(i => `${i.path}: ${i.reason}`).join("; "));
+      }
+    }
+  } catch (error) { return deny(`Workspace rules could not be checked: ${error.message}`); }
   let session;
   try { session = pointerFor(root, event.session_id); }
   catch (error) { return deny(`Session state is invalid: ${error.message}`); }
-  if (!session) return { allowed: true, reason: "no_session_contract" };
+  if (!session) {
+    if (String(event.tool_name || "").startsWith("mcp__") && inferredKind(event) !== "read") return deny("External changes require a bounded approved contract and action authorization. Use /ready first.");
+    return { allowed: true, reason: "no_session_contract" };
+  }
   const pointer = session.value;
   if (!/^[a-z0-9][a-z0-9._-]{0,63}$/.test(pointer.task_id || "")) return deny("Session pointer contains an invalid task id");
   const expectedPath = `.hames/contracts/active/${pointer.task_id}`;
@@ -245,6 +275,18 @@ function guardToolUse(event) {
   }
 
   const input = event.tool_input || {};
+  if (event.tool_name === "Bash" && contract.status === "ACTIVE") {
+    const candidates = contract.required_evidence.filter(e => ["command", "test"].includes(e.type) && e.command === input.command);
+    if (candidates.length > 1) return deny("Verification command matches multiple evidence requirements; use distinct commands.");
+    if (candidates.length === 1) {
+      const requirement = candidates[0];
+      const action = contract.actions.find(a => a.id === requirement.action_id);
+      if (!action) return deny("Verification action is missing");
+      try { recordPendingToolIntent(root, contract.task_id, event.session_id, event.tool_use_id, {target_id:action.target,action_id:action.id,evidence_id:requirement.id,phase:requirement.phase},toolInputDigest(input)); }
+      catch(error) { return deny(error.message); }
+      return {allowed:true,reason:"exact_verification_command"};
+    }
+  }
   let structuredTarget = null;
   let structuredAction = null;
   if (input.hames_target_id || input.hames_action_id) {
@@ -281,7 +323,7 @@ function guardToolUse(event) {
   let criticalAction = null;
   for (const candidate of candidates) {
     let resolved;
-    try { resolved = resolveInsideRoot(root, candidate); }
+    try { resolved = resolveInsideRoot(root, path.resolve(event.tool_input?.cwd || event.cwd || root, candidate)); }
     catch (error) { return deny(error.message); }
     if (matches(resolved.relative, deniedPatterns)) return deny(`Target is explicitly denied: ${resolved.relative}`);
     if (!matches(resolved.relative, allowedPatterns)) return deny(`Target is outside the approved file scope: ${resolved.relative}`);
@@ -329,4 +371,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { findProjectRoot, guardToolUse, resolveInsideRoot };
+module.exports = { findProjectRoot, guardToolUse, resolveInsideRoot, toolPaths, inferredKind };

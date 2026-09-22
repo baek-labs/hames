@@ -1,94 +1,87 @@
 # Hames
 
-Hames is a workspace-first, general-purpose harness for AI agents. It separates what a user approves from how an agent implements it, guards the approved boundary, and uses observable evidence to decide whether work is complete.
+Hames is an AI workspace harness shaped by its user. Install one plugin, choose your folders and rules in a first-use conversation, and let your agent keep work in the right place with maintained file indexes.
 
-Hames handles code, documents, browser work, and external service operations through the same `setup → ready → go` flow.
+It works with code, documents, browser work, and external service tasks. Ordinary file work needs no Git and no task contract. Larger tasks can use the included intent-to-execution workflow adapted from DryForge.
 
-## How it works
+## First use
 
-1. Install the Hames plugin for your agent host.
-2. Open the target project and run `/setup`.
-3. Review the proposed project files and approve the exact changes.
-4. Run `/ready` to define and review one task contract.
-5. Run `/go` in that conversation to approve and execute the exact contract just shown.
-6. Review the evidence and accept the result; Hames then archives the contract.
+1. Install the Hames plugin for Codex or Claude Code and review its hooks.
+2. Open the folder you want to use as your AI work root. In a fresh session, Hames invites setup when its startup hook is available; otherwise invoke `/setup`.
+3. Describe the workspaces you want. Choose folder names, purposes, subfolder roles, file rules, and existing folders to preserve. Examples are editable, never fixed categories.
+4. Review the complete folder and file-change preview, then approve it once.
+5. Work normally. Supported file-tool writes update the affected indexes. Use `/index` to inspect inventory and rules.
 
-Installing the Hames plugin adds the skills and hooks to the host. `/setup` is a separate step that configures the current project. It does not copy skill files into the project.
+Installing a plugin does not itself configure a folder or prove hook trust and execution. See [host support](docs/host-support.md).
 
 ## Install
 
 ### Codex
 
-Add this repository as a marketplace source:
-
 ```sh
 codex plugin marketplace add baek-labs/hames --ref main
+codex plugin add hames@baek-labs
 ```
 
-Restart the Codex app, select the Baek Labs source in the Plugins Directory, and install Hames. Review and trust the bundled hooks before expecting them to run.
+Open a new session after installation and review the bundled hooks in the host.
 
 ### Claude Code
-
-Inside Claude Code:
 
 ```text
 /plugin marketplace add baek-labs/hames
 /plugin install hames@baek-labs
 ```
 
-Restart Claude Code after installation so its skills and hooks are rediscovered.
+Start a new Claude Code session. The repository's generated packages are the installable source; publication of local changes is a separate action.
 
-Codex and Claude Code are the first supported hosts. Other hosts are not officially supported by this release; see [host support](docs/host-support.md).
+## Commands
 
-## Core commands
-
-| Command | Purpose |
+| Command | What it does |
 |---|---|
-| `/setup` | Preview, approve, apply, and diagnose project-level Hames configuration. |
-| `/ready` | Turn user intent into a readable contract with outputs, work order, review policy, and evidence. |
-| `/go` | Approve the contract just shown, execute it in dependency order, verify it, obtain acceptance, and archive it. |
-| `/doctor` | Inspect plugin, project, contract, and session health without changing anything. |
+| `/setup` | Ask about your workspace, preview changes, apply your choices, or reconfigure them. |
+| `/ready` | Resolve open decisions and present one bounded task contract. |
+| `/go` | Approve the contract just shown, execute, verify, and present the result for acceptance. |
+| `/index` | Read-only audit of indexes, placement, names, and configured document rules. |
+| `/doctor` | Read-only diagnosis of configuration, recovery state, package wiring, and hook observations. |
 
-`/go` approval does not authorize a critical action. Hames asks again immediately before deletion, sending, publication, deployment, payment, permission changes, or impactful external-service mutations.
+Hosts may display these with a Hames namespace. Use the discovered command names. Index repairs are previewed and run only when requested; an audit never moves or deletes documents.
 
-## Project files
-
-`/setup` proposes this project-owned structure:
+## Your workspace
 
 ```text
-.hames/
-├── config.yaml
-├── workspaces/default.yaml
-├── context/project.md
-├── contracts/active/
-├── contracts/archive/
-└── state/
+your-root/
+├── AGENTS.md / CLAUDE.md
+├── _Index.md
+├── .hames/                 # settings, workspace roles, contracts and local state
+├── docs/                   # shared long-lived operating documents
+│   └── _Index.md
+└── <your chosen folders>/
+    └── _Index.md
 ```
 
-Existing `AGENTS.md` and `CLAUDE.md` files are preserved. Hames adds only a clearly marked boundary block after showing the diff and receiving approval. `.hames/state/` is always excluded from Git; tracking of `.hames/contracts/` is the user's choice.
+Hames reads common rules, the current workspace index, and relevant shared documents. It does not load every document by default or copy a full documentation set into each folder. Existing user text is preserved in entry files and indexes. Repeated setup with the same choices makes no changes.
 
-If `/setup` recognizes a previously distributed public Hames folder, it offers a same-folder transition. Checked-in legacy manifests identify unchanged system files; modified, user-owned, protected, unknown, and submodule content stays in place. Workspace paths are never moved or inferred from folder names, and ambiguous registrations wait for confirmation. See [project setup and legacy transition](docs/setup.md).
+The built-in DryForge-derived workflow is adapted for shared documents, selective loading, one contract store, and Git only on explicit request. It is not the unmodified upstream plugin. [Integration and attribution](docs/dryforge-integration.md).
 
-## Safety boundary
+## Verification boundaries
 
-The file guard rejects project escape through absolute paths, `..`, or symlinks and checks the active contract hash. Shell inspection is best-effort, and unstructured browser or UI work cannot be made safe by a path hook alone. External changes require observable pre-state, action, and post-state evidence unless the user approves a documented exception.
+Structured file-tool events support automatic indexing. Shell commands, external applications, and sync tools may require `/index` to discover changes; there is no background watcher. Semantic classification is reported separately from mechanical rule violations. Unreadable or unsupported items are never counted as fully verified.
 
-See [architecture](docs/architecture.md), [safety](docs/safety.md), [extensions](docs/extensions.md), and [development](docs/development.md).
-
-## Scope
-
-Hames Core provides only `/setup`, `/ready`, `/go`, and `/doctor`. It does not include fixed personas, fixed workspaces, personal service integrations, model handoff systems, or Git/content/team packs. Extension points are documented, but optional packs are not implemented in Core.
+Paths cannot escape the configured root through `..` or symlinks. Shell and unstructured UI inspection is best-effort. Deleting, sending, publishing, deploying, paying, and changing permissions require authorization for that action. [Safety](docs/safety.md).
 
 ## Development
+
+`src/` is the source of truth. Do not edit generated `packages/` by hand.
 
 ```sh
 node --test
 node scripts/build.mjs
 node scripts/verify.mjs
+git diff --check
 ```
 
-Edit `src/`, not `packages/`. The generated `packages/codex` and `packages/claude` directories are committed distribution artifacts and must exactly match the source build.
+See [architecture](docs/architecture.md), [setup](docs/setup.md), [indexing](docs/indexing.md), [development](docs/development.md), and [verification evidence](docs/verification.md).
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT for Hames. Adapted DryForge materials retain their original MIT copyright notice in `src/integrations/dryforge/LICENSE` and both generated packages.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.0 — Workspace renewal
+
+- User-chosen first-use workspace and folder rules.
+- Automatic managed indexes and read-only inventory auditing.
+- Shared root documents with scoped context selection.
+- Integrated DryForge-derived intent and execution; no separate install or Git prerequisite.
+- Preservation, recovery and host-observation diagnostics.
+
+
 Notable Hames changes are recorded here.
 
 ## Unreleased

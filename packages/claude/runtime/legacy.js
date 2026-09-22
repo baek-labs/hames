@@ -101,7 +101,8 @@ function detectLegacy(root, { manifestRoot = DEFAULT_MANIFEST_ROOT } = {}) {
   const currentMarkers = ["src/runtime/legacy.js", "platform/codex/plugin.json", ".agents/plugins/marketplace.json"].filter((relative) => fs.existsSync(path.join(projectRoot, relative)));
   if (currentMarkers.length >= 2) return { matched: false, configured: false, basis: "current_distribution" };
   const manifests = loadManifests(manifestRoot);
-  const origin = normalizedOrigin(runGit(projectRoot, ["remote", "get-url", "origin"]));
+  const gitRoot = runGit(projectRoot, ["rev-parse", "--show-toplevel"])?.trim();
+  const origin = gitRoot && fs.realpathSync(gitRoot) === projectRoot ? normalizedOrigin(runGit(projectRoot, ["remote", "get-url", "origin"])) : null;
   const shallow = runGit(projectRoot, ["rev-parse", "--is-shallow-repository"])?.trim() === "true";
   if (origin === "https://github.com/baek-labs/hames" && !shallow) {
     for (const manifest of [...manifests].reverse()) {
@@ -127,6 +128,13 @@ function safeResolved(root, relative) {
   const escaped = path.relative(rootReal, real);
   if (escaped === ".." || escaped.startsWith(`..${path.sep}`) || path.isAbsolute(escaped)) throw new Error(`Legacy path escapes project: ${relative}`);
   return absolute;
+}
+
+function safeEntryPath(root, relative) {
+  const normalized = normalizeRelative(relative);
+  const parent = path.posix.dirname(normalized);
+  safeResolved(root, parent === "." ? "." : parent);
+  return path.resolve(root, normalized);
 }
 
 function kindOf(stat) {
@@ -156,7 +164,7 @@ function protectedInventory(root) {
 }
 
 function currentEntry(root, entry) {
-  const absolute = safeResolved(root, entry.path);
+  const absolute = safeEntryPath(root, entry.path);
   if (!fs.existsSync(absolute)) return null;
   const stat = fs.lstatSync(absolute);
   const kind = kindOf(stat);
@@ -170,7 +178,7 @@ function currentEntry(root, entry) {
     const target = path.resolve(path.dirname(absolute), link);
     const targetRelative = path.relative(fs.realpathSync(root), target);
     const inside = targetRelative !== ".." && !targetRelative.startsWith(`..${path.sep}`) && !path.isAbsolute(targetRelative);
-    return { kind, matches: entry.kind === kind && digest(link) === entry.sha256, current_digest: digest(link), symlink_inside: inside, target_path_digest: digest(target) };
+    return { kind, matches: entry.kind === kind && digest(link) === entry.sha256, current_digest: digest(link), symlink_inside: inside };
   }
   if (kind !== "file") return { kind, matches: false, current_digest: null };
   const content = fs.readFileSync(absolute);
@@ -193,7 +201,7 @@ function legacyWorkspaceMappings(root, manifest) {
 function workspaceCandidates(root, manifest, decisions) {
   const manifestPaths = new Set(manifest.files.map((item) => item.path));
   const mappings = legacyWorkspaceMappings(root, manifest);
-  const decisionMap = new Map(decisions.map((item) => [normalizeRelative(item.path), item.name]));
+  const decisionMap = new Map(decisions.map((item) => [normalizeRelative(item.path), item]));
   const candidates = [];
   function walk(directory, prefix = "") {
     for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
@@ -205,21 +213,25 @@ function workspaceCandidates(root, manifest, decisions) {
       const onlySystem = [...manifestPaths].some((systemPath) => systemPath === relative || systemPath.startsWith(`${relative}/`));
       if (evidence.length && !onlySystem) {
         const mapped = mappings.get(relative);
-        const selected = decisionMap.get(relative) || mapped || null;
+        const decision = decisionMap.get(relative);
+        const preserve = decision?.action === "preserve" || decision?.disposition === "preserve" || decision?.preserve === true;
+        const selected = preserve ? null : decision?.name || mapped || null;
         if (selected && !/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(selected)) throw new Error(`Invalid workspace registration name: ${selected}`);
-        candidates.push({ path: relative, evidence, registration_name: selected, confirmed: Boolean(selected), source: decisionMap.has(relative) ? "user_confirmation" : mapped ? "legacy_config" : "needs_confirmation" });
+        candidates.push({ path: relative, evidence, registration_name: selected, confirmed: Boolean(selected) || preserve, disposition: preserve ? "preserve" : selected ? "register" : "unresolved", source: decisionMap.has(relative) ? "user_confirmation" : mapped ? "legacy_config" : "needs_confirmation" });
       }
       walk(absolute, relative);
     }
   }
   walk(root);
-  for (const [relative, name] of decisionMap) {
+  for (const [relative, decision] of decisionMap) {
     if (candidates.some((item) => item.path === relative)) continue;
     if (relative === ".git" || relative === ".hames" || isProtectedPath(relative)) throw new Error(`Unsafe workspace decision path: ${relative}`);
     const absolute = safeResolved(root, relative);
     if (!fs.existsSync(absolute) || !fs.statSync(absolute).isDirectory()) throw new Error(`Confirmed workspace path is not a directory: ${relative}`);
-    if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(name || "")) throw new Error(`Invalid workspace registration name: ${name}`);
-    candidates.push({ path: relative, evidence: ["user_confirmation"], registration_name: name, confirmed: true, source: "user_confirmation" });
+    const preserve = decision?.action === "preserve" || decision?.disposition === "preserve" || decision?.preserve === true;
+    const name = preserve ? null : decision?.name;
+    if (!preserve && !/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(name || "")) throw new Error(`Invalid workspace registration name: ${name}`);
+    candidates.push({ path: relative, evidence: ["user_confirmation"], registration_name: name, confirmed: true, disposition: preserve ? "preserve" : "register", source: "user_confirmation" });
   }
   return candidates.sort((a, b) => a.path.localeCompare(b.path));
 }
@@ -245,6 +257,44 @@ function unknownInventory(root, manifestPaths, protectedPaths, candidatePaths) {
   }
   walk(root);
   return output;
+}
+
+function omitCleanupLinksFromIndexes(setupPlan, cleanupPaths, setupRuntime) {
+  const omitted = new Set(cleanupPaths);
+  if (!omitted.size) return;
+  const kept = [];
+  for (const operation of setupPlan.operations) {
+    if (!operation.path.endsWith("_Index.md") || typeof operation.after !== "string") {
+      kept.push(operation);
+      continue;
+    }
+    const start = operation.after.indexOf("<!-- HAMES:INDEX:START -->");
+    const end = operation.after.indexOf("<!-- HAMES:INDEX:END -->", start);
+    if (start < 0 || end < 0) {
+      kept.push(operation);
+      continue;
+    }
+    const directory = path.posix.dirname(operation.path) === "." ? "." : path.posix.dirname(operation.path);
+    const block = operation.after.slice(start, end);
+    const lines = block.split("\n");
+    const retained = lines.filter((line) => {
+      const match = line.match(/\]\((?:<)?([^\s)>]+)>?\)/);
+      if (!match) return true;
+      let raw;
+      try { raw = decodeURIComponent(match[1]); } catch { return true; }
+      if (/^(?:[a-z]+:|#)/i.test(raw)) return true;
+      const resolved = path.posix.normalize(path.posix.join(directory, raw.split("#")[0]));
+      return !omitted.has(resolved);
+    });
+    const after = `${operation.after.slice(0, start)}${retained.join("\n")}${operation.after.slice(end)}`;
+    if (after !== operation.before) kept.push({ ...operation, after });
+  }
+  setupPlan.operations = kept;
+  if (Array.isArray(setupPlan.index_operations)) {
+    const byPath = new Map(kept.filter((operation) => operation.path.endsWith("_Index.md")).map((operation) => [operation.path, operation]));
+    setupPlan.index_operations = setupPlan.index_operations.map((operation) => byPath.get(operation.path)).filter(Boolean);
+  }
+  setupPlan.plan_hash = setupRuntime.computePlanHash(setupPlan);
 }
 
 function planLegacyTransition({ root, manifestRoot = DEFAULT_MANIFEST_ROOT, projectName, contractTracking, workspaceDecisions = [] }) {
@@ -274,29 +324,33 @@ function planLegacyTransition({ root, manifestRoot = DEFAULT_MANIFEST_ROOT, proj
     }
   }
   const candidates = workspaceCandidates(projectRoot, manifest, workspaceDecisions);
-  const registrations = candidates.filter((item) => item.confirmed).map((item) => ({ path: item.path, name: item.registration_name }));
+  const registrations = candidates.filter((item) => item.confirmed && item.registration_name).map((item) => ({ path: item.path, name: item.registration_name }));
+  const candidateDecisions = candidates.filter((item) => item.confirmed).map((item) => item.disposition === "preserve"
+    ? { path: item.path, action: "preserve" }
+    : { path: item.path, name: item.registration_name });
   preserved.push(...unknownInventory(projectRoot, manifestPaths, protectedPaths, new Set(candidates.map((item) => item.path))));
-  const setupPlan = require("./setup.js").planSetup({ root: projectRoot, projectName, contractTracking, workspaces: [{ id: "default", path: "." }, ...registrations.map((item) => ({ id: item.name, path: item.path }))], replaceEntries: cleanup.filter((item) => item.action === "replace_entry").map((item) => item.path), skipLegacy: true });
+  const setupRuntime = require("./setup.js");
+  const setupPlan = setupRuntime.planSetup({ root: projectRoot, projectName, contractTracking, workspaces: [{ id: "default", path: "." }, ...registrations.map((item) => ({ id: item.name, path: item.path }))], replaceEntries: cleanup.filter((item) => item.action === "replace_entry").map((item) => item.path), skipLegacy: true, compatibility: true });
+  omitCleanupLinksFromIndexes(setupPlan, cleanup.filter((item) => item.action === "remove").map((item) => item.path), setupRuntime);
   const hashInput = {
     project_realpath: projectRoot,
     manifest_digest: manifest.manifest_digest,
     detection_basis: detected.basis,
     cleanup: cleanup.map((item) => ({ path: item.path, kind: item.kind, current_digest: item.current_digest, ...(item.kind === "symlink" ? { symlink_inside: item.symlink_inside, target_path_digest: item.target_path_digest } : {}), action: item.action })).sort((a, b) => a.path.localeCompare(b.path)),
     setup_plan_hash: setupPlan.plan_hash,
-    workspace_candidates: candidates.map((item) => ({ path: item.path, evidence: item.evidence, registration_name: item.registration_name, confirmed: item.confirmed })).sort((a, b) => a.path.localeCompare(b.path)),
+    workspace_candidates: candidates.map((item) => ({ path: item.path, evidence: item.evidence, registration_name: item.registration_name, confirmed: item.confirmed, disposition: item.disposition })).sort((a, b) => a.path.localeCompare(b.path)),
+    workspace_decisions: candidateDecisions.sort((a, b) => a.path.localeCompare(b.path)),
     preserved: preserved.map((item) => item.classification === "protected" ? { path: item.path, kind: item.kind, exists: item.exists, classification: item.classification } : item).sort((a, b) => a.path.localeCompare(b.path)),
     contract_tracking: contractTracking,
   };
-  const questions = [
-    ...candidates.filter((item) => !item.confirmed).map((item) => ({ id: `workspace:${item.path}`, path: item.path, prompt: "Confirm whether this is a workspace and choose its registration name, or preserve it unregistered." })),
-    ...hashInput.preserved.filter((item) => item.classification === "modified_system" || item.classification === "unknown_user").map((item) => ({ id: `preserve:${item.path}`, path: item.path, prompt: "This item is preserved. Confirm its ownership and any later manual handling." })),
-  ];
-  return { status: "ready", kind: "legacy_transition", root: projectRoot, manifest_id: manifest.id, manifest_digest: manifest.manifest_digest, manifest_root: path.resolve(manifestRoot), detection: detected, cleanup: hashInput.cleanup, preserved: hashInput.preserved, workspace_candidates: candidates, workspace_registrations: registrations, questions, setup_plan: setupPlan, hash_input: hashInput, plan_hash: digest(hashInput) };
+  const questions = candidates.filter((item) => !item.confirmed).map((item) => ({ id: `workspace:${item.path}`, path: item.path, prompt: "Confirm whether this is a workspace and choose its registration name, or explicitly preserve it unregistered." }));
+  const information = hashInput.preserved.filter((item) => item.classification === "modified_system" || item.classification === "unknown_user").map((item) => ({ path: item.path, classification: item.classification }));
+  return { status: "ready", kind: "legacy_transition", root: projectRoot, manifest_id: manifest.id, manifest_digest: manifest.manifest_digest, manifest_root: path.resolve(manifestRoot), detection: detected, cleanup: hashInput.cleanup, preserved: hashInput.preserved, workspace_candidates: candidates, workspace_registrations: registrations, workspace_decisions: candidateDecisions, questions, information, setup_plan: setupPlan, hash_input: hashInput, plan_hash: digest(hashInput) };
 }
 
 function planStillCurrent(plan) {
   for (const item of plan.cleanup) {
-    const absolute = safeResolved(plan.root, item.path);
+    const absolute = safeEntryPath(plan.root, item.path);
     if (!fs.existsSync(absolute)) return false;
     if (item.kind === "file" && digest(fs.readFileSync(absolute)) !== item.current_digest) return false;
     if (item.kind === "symlink" && digest(fs.readlinkSync(absolute)) !== item.current_digest) return false;
@@ -323,10 +377,11 @@ function applyLegacyTransition(plan, { approved = false, planHash = null, failAf
   if (!approved) return { applied: false, reason: "approval_required" };
   if (plan.status === "configured") return { applied: false, reason: "already_configured" };
   if (plan.status !== "ready" || plan.kind !== "legacy_transition") throw new Error("Legacy transition plan is not ready");
+  if (plan.questions?.length) throw new Error("Legacy transition has unresolved workspace questions; register or preserve each candidate before applying");
   if (planHash !== plan.plan_hash || digest(plan.hash_input) !== plan.plan_hash) throw new Error("Legacy transition plan hash changed after preview");
   if (digest(plan.cleanup) !== digest(plan.hash_input.cleanup) || plan.setup_plan.plan_hash !== plan.hash_input.setup_plan_hash) throw new Error("Legacy transition execution surface differs from the approved plan");
   if (!planStillCurrent(plan)) throw new Error("Legacy files changed after preview; generate a new plan");
-  const fresh = planLegacyTransition({ root: plan.root, manifestRoot: plan.manifest_root, projectName: plan.setup_plan.projectName, contractTracking: plan.setup_plan.contractTracking, workspaceDecisions: plan.workspace_registrations });
+  const fresh = planLegacyTransition({ root: plan.root, manifestRoot: plan.manifest_root, projectName: plan.setup_plan.projectName, contractTracking: plan.setup_plan.contractTracking, workspaceDecisions: plan.workspace_decisions || plan.workspace_registrations });
   if (fresh.plan_hash !== plan.plan_hash) throw new Error("Legacy transition inputs changed after preview");
   const setup = require("./setup.js");
   const removed = [];
@@ -336,7 +391,7 @@ function applyLegacyTransition(plan, { approved = false, planHash = null, failAf
     setup.applySetup(plan.setup_plan, { approved: true });
     setupApplied = true;
     const removalPlan = plan.cleanup.filter((entry) => entry.action === "remove").map((item) => {
-      const target = safeResolved(plan.root, item.path);
+      const target = safeEntryPath(plan.root, item.path);
       const stat = fs.lstatSync(target);
       if (!stat.isFile() && !stat.isSymbolicLink()) return null;
       const kind = stat.isSymbolicLink() ? "symlink" : "file";
@@ -350,7 +405,7 @@ function applyLegacyTransition(plan, { approved = false, planHash = null, failAf
     for (const item of removalPlan) {
       recovery.removed_count = removed.length + 1;
       writeRecovery(recoveryFile, recovery);
-      const target = safeResolved(plan.root, item.path);
+      const target = safeEntryPath(plan.root, item.path);
       const current = item.kind === "symlink" ? fs.readlinkSync(target) : fs.readFileSync(target);
       if (digest(current) !== item.current_digest) throw new Error(`Legacy file changed immediately before cleanup: ${item.path}`);
       removed.push(item);

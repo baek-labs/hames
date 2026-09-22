@@ -1,5 +1,10 @@
-version: 1
+version: 2
 id: {{WORKSPACE_ID_JSON}}
 path: {{WORKSPACE_PATH_JSON}}
-context: [".hames/context/project.md"]
-protect: [".hames/config.yaml", {{WORKSPACE_CONFIG_JSON}}]
+name: {{WORKSPACE_NAME_JSON}}
+purpose: {{WORKSPACE_PURPOSE_JSON}}
+folders: {{FOLDERS_JSON}}
+rules: {{RULES_JSON}}
+exclude: {{EXCLUDE_JSON}}
+context: {{CONTEXT_JSON}}
+protect: {{PROTECT_JSON}}

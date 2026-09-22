@@ -14,7 +14,7 @@ const PLUGIN_ROOT = path.resolve(__dirname, "../..");
 
 function project() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "hames-guard-"));
-  applySetup(planSetup({ root, projectName: "Guard test", contractTracking: "untracked" }), { approved: true });
+  applySetup(planSetup({ root, workspaces: [{ id: "default", path: ".", purpose: "Test workspace" }], projectName: "Guard test", contractTracking: "untracked" }), { approved: true });
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "src/allowed.js"), "module.exports = true;\n");
   return root;
@@ -53,6 +53,28 @@ test("scope guard permits declared files and blocks traversal, denied paths, and
   const outside = fs.mkdtempSync(path.join(os.tmpdir(), "hames-outside-"));
   fs.symlinkSync(outside, path.join(root, "src/link"));
   assert.match(guardToolUse({ cwd: root, session_id: "session", tool_name: "Write", tool_input: { file_path: "src/link/escape.txt" } }).reason, /outside|symlink/i);
+});
+
+test("native Bash verification records exact-command evidence without custom tool fields", () => {
+  const root = project(); const task = spec("native-command");
+  task.actions[0].required_evidence = ["native-test"];
+  task.required_evidence = [{ id:"native-test", type:"test", action_id:"edit", phase:"after", command:"node --test native.test.js", predicate:{exit_code:0,output_includes:"passed"} }];
+  task.acceptance_criteria[0].evidence_ids = ["native-test"];
+  activate(root,task);
+  const event={cwd:root,session_id:"session",hook_event_name:"PreToolUse",tool_name:"Bash",tool_use_id:"native-command-1",tool_input:{command:"node --test native.test.js"}};
+  assert.equal(guardToolUse(event).allowed,true);
+  const recorded=captureHookEvidence({...event,hook_event_name:"PostToolUse",tool_response:{stdout:"passed",stderr:"",interrupted:false,isImage:false}});
+  assert.equal(recorded.recorded,true,recorded.reason);
+  const evidence=JSON.parse(fs.readFileSync(path.join(root,".hames/contracts/active/native-command/evidence.json"),"utf8"));
+  assert.equal(evidence.items["native-test"].status,"passed");
+  assert.equal(captureHookEvidence({...event,tool_use_id:"unmatched",hook_event_name:"PostToolUse",tool_input:{command:"node -e 'console.log(\"passed\")'"},tool_response:{stdout:"passed",stderr:"",interrupted:false}}).recorded,false);
+});
+
+test("external mutations require a contract while reads and local ordinary work remain available", () => {
+ const root=project();
+ for(const name of ["mcp__mock__create","mcp__mock__send","mcp__mock__publish","mcp__mock__unknown_operation"])assert.equal(guardToolUse({cwd:root,tool_name:name,tool_input:{}}).allowed,false,name);
+ assert.equal(guardToolUse({cwd:root,tool_name:"mcp__mock__get",tool_input:{}}).allowed,true);
+ assert.equal(guardToolUse({cwd:root,tool_name:"Bash",tool_input:{command:"rm ../outside.txt"}}).allowed,false);
 });
 
 test("scope guard blocks a tampered contract and best-effort shell escape", () => {

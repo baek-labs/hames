@@ -7,7 +7,7 @@ const rootIndex = process.argv.indexOf("--root");
 const ROOT = rootIndex >= 0
   ? path.resolve(process.argv[rootIndex + 1])
   : path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SHARED = ["skills", "hooks", "runtime", "schemas", "templates", "legacy"];
+const SHARED = ["skills", "hooks", "runtime", "schemas", "templates", "legacy", "integrations"];
 const HOSTS = ["codex", "claude"];
 
 async function readJson(relative) {
@@ -72,7 +72,7 @@ async function verifyGeneratedFiles() {
   }
   const skillNames = (await fs.readdir(path.join(ROOT, "src/skills"), { withFileTypes: true }))
     .filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
-  assert.deepEqual(skillNames, ["doctor", "go", "ready", "setup"], "Core must expose exactly four skills");
+  assert.deepEqual(skillNames, ["doctor", "go", "index", "ready", "setup"], "Core must expose exactly five skills");
 }
 
 async function verifyJsonSurfaces() {
@@ -102,7 +102,7 @@ async function textFiles(root) {
 async function verifyNoFixedAssumptions() {
   const roots = [path.join(ROOT, "src"), path.join(ROOT, "platform")];
   const files = [path.join(ROOT, "README.md"), ...await textFiles(path.join(ROOT, "docs"))];
-  for (const root of roots) files.push(...(await textFiles(root)).filter((file) => !file.includes(`${path.sep}legacy${path.sep}manifests${path.sep}`) && file !== path.join(ROOT, "src/runtime/legacy.js")));
+  for (const root of roots) files.push(...(await textFiles(root)).filter((file) => !file.includes(`${path.sep}legacy${path.sep}manifests${path.sep}`) && !file.includes(`${path.sep}integrations${path.sep}dryforge${path.sep}upstream${path.sep}`) && file !== path.join(ROOT, "src/runtime/legacy.js")));
   const forbidden = /\b(?:CEO|COO|CFO|CSO|CBO|Marketer|AI_COMM|Arsenal|Investment|Perplexity|Naver|Notion)\b|\/Users\/|[A-Za-z]:\\Users\\|Hames v2|v1-legacy/i;
   for (const file of files) {
     const content = await fs.readFile(file, "utf8");
@@ -115,4 +115,4 @@ await verifyManifests();
 await verifyGeneratedFiles();
 await verifyJsonSurfaces();
 await verifyNoFixedAssumptions();
-console.log("Verified manifests, schemas, hooks, generated packages, four-skill Core, and hardcoding boundaries.");
+console.log("Verified manifests, schemas, hooks, generated packages, five-skill Core, and hardcoding boundaries.");

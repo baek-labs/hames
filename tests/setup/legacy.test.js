@@ -16,6 +16,7 @@ const {
   loadManifests,
   planLegacyTransition,
 } = require("../../src/runtime/legacy.js");
+const { auditIndexes } = require("../../src/runtime/index.js");
 
 const REPO = path.resolve(__dirname, "../..");
 const LAST_LEGACY_COMMIT = "3f2d2db7554cf80966a81df91539225b4f87dd43";
@@ -284,4 +285,58 @@ test("protected-name rules run before any content classification", () => {
   for (const relative of [".env.example", "credentials.example.json", "token.example.json"]) {
     assert.equal(isProtectedPath(relative), false, relative);
   }
+});
+
+test("legacy apply blocks unresolved workspace candidates until register or preserve is chosen", () => {
+  const manifest = loadManifests(DEFAULT_MANIFEST_ROOT).find((item) => item.commits.includes(LAST_LEGACY_COMMIT));
+  const root = noGitFixture(manifest);
+  fs.mkdirSync(path.join(root, "client-alpha"));
+  fs.writeFileSync(path.join(root, "client-alpha/AGENTS.md"), "# Client\n");
+  const plan = planLegacyTransition({ root, manifestRoot: DEFAULT_MANIFEST_ROOT, projectName: "Legacy", contractTracking: "tracked", workspaceDecisions: [] });
+  assert.ok(plan.questions.some((question) => question.id === "workspace:client-alpha"));
+  assert.throws(() => applyLegacyTransition(plan, { approved: true, planHash: plan.plan_hash }), /question|confirmation|unresolved/i);
+  assert.equal(fs.existsSync(path.join(root, ".hames/config.yaml")), false);
+  assert.equal(fs.readFileSync(path.join(root, "client-alpha/AGENTS.md"), "utf8"), "# Client\n");
+});
+
+test("legacy transition accepts an explicit preserve decision for an ambiguous workspace", () => {
+  const manifest = loadManifests(DEFAULT_MANIFEST_ROOT).find((item) => item.commits.includes(LAST_LEGACY_COMMIT));
+  const root = noGitFixture(manifest);
+  fs.mkdirSync(path.join(root, "client-alpha"));
+  fs.writeFileSync(path.join(root, "client-alpha/AGENTS.md"), "# Client\n");
+  const plan = planLegacyTransition({ root, manifestRoot: DEFAULT_MANIFEST_ROOT, projectName: "Legacy", contractTracking: "tracked", workspaceDecisions: [{ path: "client-alpha", action: "preserve" }] });
+  assert.equal(plan.questions.length, 0);
+  assert.equal(plan.workspace_registrations.some((item) => item.path === "client-alpha"), false);
+  const result = applyLegacyTransition(plan, { approved: true, planHash: plan.plan_hash });
+  assert.equal(result.applied, true);
+  assert.equal(fs.existsSync(path.join(root, "client-alpha/AGENTS.md")), true);
+});
+
+test("legacy cleanup removes deleted files from the approved index preview", () => {
+  const manifest = loadManifests(DEFAULT_MANIFEST_ROOT).find((item) => item.commits.includes(LAST_LEGACY_COMMIT));
+  const root = noGitFixture(manifest, ["HamesSystem_Public.md"]);
+  const plan = planLegacyTransition({ root, manifestRoot: DEFAULT_MANIFEST_ROOT, projectName: "Legacy", contractTracking: "tracked", workspaceDecisions: [] });
+  assert.ok(plan.cleanup.some((item) => item.path === "HamesSystem_Public.md" && item.action === "remove"));
+  const result = applyLegacyTransition(plan, { approved: true, planHash: plan.plan_hash });
+  assert.equal(result.applied, true);
+  assert.equal(fs.existsSync(path.join(root, "HamesSystem_Public.md")), false);
+  for (const relative of ["_Index.md", "docs/_Index.md"]) {
+    const file = path.join(root, relative);
+    if (fs.existsSync(file)) assert.doesNotMatch(fs.readFileSync(file, "utf8"), /HamesSystem_Public\.md/);
+  }
+  assert.equal(auditIndexes(root).issues.some((issue) => issue.rule === "broken_link"), false);
+});
+
+test("legacy detection preserves an external final symlink without reading its target", () => {
+  const manifest = loadManifests(DEFAULT_MANIFEST_ROOT).find((item) => item.commits.includes(LAST_LEGACY_COMMIT));
+  const root = noGitFixture(manifest);
+  const outside = path.join(path.dirname(root), "hames-legacy-external-target.txt");
+  fs.writeFileSync(outside, "outside secret\n");
+  fs.rmSync(path.join(root, "README.md"));
+  fs.symlinkSync(outside, path.join(root, "README.md"));
+  const plan = planLegacyTransition({ root, manifestRoot: DEFAULT_MANIFEST_ROOT, projectName: "Legacy", contractTracking: "tracked", workspaceDecisions: [] });
+  const preserved = plan.preserved.find((item) => item.path === "README.md");
+  assert.equal(preserved.classification, "external_symlink");
+  assert.equal(preserved.target_path_digest, undefined);
+  fs.rmSync(outside);
 });

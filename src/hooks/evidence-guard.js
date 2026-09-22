@@ -14,6 +14,15 @@ function sessionPointer(root, sessionId) {
   return JSON.parse(fs.readFileSync(file, "utf8"));
 }
 
+function normalizedResponse(event) {
+  const response = event.tool_response;
+  if (event.tool_name === "Bash" && event.hook_event_name === "PostToolUse" && response && typeof response === "object" && typeof response.stdout === "string" && typeof response.stderr === "string" && response.interrupted === false && !response.backgroundTaskId && !response.error) {
+    // Claude emits PostToolUse only for successful foreground calls; failures use PostToolUseFailure.
+    return {...response, exit_code: Number.isInteger(response.exit_code) ? response.exit_code : 0, output: response.stdout + response.stderr};
+  }
+  return response;
+}
+
 function evidenceInput(requirement, event) {
   const input = event.tool_input || {};
   return {
@@ -27,7 +36,7 @@ function evidenceInput(requirement, event) {
       tool_use_id: event.tool_use_id,
       method: input.hames_method || event.tool_name,
       tool_input: event.tool_input,
-      tool_response: event.tool_response,
+      tool_response: normalizedResponse(event),
     },
   };
 }

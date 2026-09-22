@@ -1,0 +1,33 @@
+{
+  "repository": "https://github.com/prekuter/dryforge",
+  "commit": "c950599d463d083a48e49c6dc1207904cf0c4374",
+  "license": "MIT",
+  "files": [
+    {
+      "source": "LICENSE",
+      "sha256": "cbb898cda3a2ca0ea89eec983ebdd6fc5c60a59dc45338935154c145c59cf9c1",
+      "file": "LICENSE"
+    },
+    {
+      "source": "src/skills/ready/SKILL.md",
+      "sha256": "edc72ef7411fc2de4126ab0eebdd97d050e7227d407af940e4bb282981c253fb",
+      "file": "upstream/ready/SKILL.md"
+    },
+    {
+      "source": "src/skills/go/SKILL.md",
+      "sha256": "99c328f114bd6f530ac944cf941c45204a47b03ec9567e1f858f4055084dd13b",
+      "file": "upstream/go/SKILL.md"
+    },
+    {
+      "source": "src/skills/migration/SKILL.md",
+      "sha256": "d9f1ff733ab5c8cda5551899483527fca5f3385c224bf3be7eb63cfbb63896a0",
+      "file": "upstream/migration/SKILL.md"
+    }
+  ],
+  "adaptation": {
+    "ready": "Hames skills/ready; one contract with spec, plan and handoff",
+    "go": "Hames skills/go and runtime/contract; Git only on explicit request",
+    "migration": "Hames setup; preserve user files; no full document set",
+    "context": "Shared root docs; scope-based selective loading"
+  }
+}

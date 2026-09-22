@@ -1,7 +1,8 @@
 "use strict";
 
 const ALLOWED_TRACKING = new Set(["tracked", "untracked"]);
-const CORE_FEATURES = ["setup", "ready", "go", "doctor"];
+const workspace = require("./workspace.js");
+const CORE_FEATURES = ["setup", "ready", "go", "index", "doctor"];
 const DEFAULT_CRITICAL_ACTIONS = ["delete", "destructive_overwrite", "send", "publish", "deploy", "payment", "permission_change", "external_mutation"];
 
 function scalar(value, lineNumber) {
@@ -49,8 +50,8 @@ function validateConfig(config) {
   if (!config || typeof config !== "object" || Array.isArray(config)) {
     return { valid: false, errors: ["config must be a mapping"] };
   }
-  if (config.version !== 1) errors.push("version must be 1");
-  const allowedTop = new Set(["version", "project", "workspaces", "tracking", "guards", "features", "extensions"]);
+  if (![1, 2].includes(config.version)) errors.push("version must be 1 or 2");
+  const allowedTop = new Set(["version", "project", "workspaces", "tracking", "guards", "features", "extensions", "documents", "exclude"]);
   for (const key of Object.keys(config)) if (!allowedTop.has(key)) errors.push(`unknown config key: ${key}`);
   if (!config.project || typeof config.project.name !== "string" || !config.project.name.trim()) {
     errors.push("project.name must be a non-empty string");
@@ -70,16 +71,30 @@ function validateConfig(config) {
     errors.push("guards.critical_actions cannot remove Hames critical-action defaults");
   }
   if (config.guards && Object.keys(config.guards).some((key) => !new Set(["enabled", "critical_actions"]).has(key))) errors.push("guards contains an unknown key");
-  if (!Array.isArray(config.features) || CORE_FEATURES.some((name) => !config.features.includes(name))) {
-    errors.push("features must include setup, ready, go, and doctor");
+  const requiredFeatures = config.version === 1 ? CORE_FEATURES.filter((n) => n !== "index") : CORE_FEATURES;
+  if (!Array.isArray(config.features) || requiredFeatures.some((name) => !config.features.includes(name))) {
+    errors.push("features must include the required Core skills");
   }
-  if (Array.isArray(config.features) && (new Set(config.features).size !== config.features.length || config.features.some((name) => !CORE_FEATURES.includes(name)))) errors.push("features must contain only the four unique Core features");
+  if (Array.isArray(config.features) && (new Set(config.features).size !== config.features.length || config.features.some((name) => !CORE_FEATURES.includes(name)))) errors.push("features must contain only unique Core features");
   if (!config.extensions || typeof config.extensions !== "object" || Array.isArray(config.extensions)) {
     errors.push("extensions must be a mapping");
   } else if (Object.values(config.extensions).some((value) => !value || typeof value !== "object" || Array.isArray(value))) {
     errors.push("each extension setting must be a mapping");
   }
+  if (Array.isArray(config.workspaces) && config.workspaces.some((id) => !workspace.validId(id))) errors.push("invalid workspace id");
+  if (config.exclude !== undefined && (!Array.isArray(config.exclude) || config.exclude.some((p) => !workspace.isRelative(p) || p === "."))) errors.push("exclude must contain relative paths");
+  if (config.documents !== undefined) {
+    if (!Array.isArray(config.documents)) errors.push("documents must be an array");
+    else {
+      const seen = new Set();
+      for (const d of config.documents) {
+        if (!d || !workspace.isRelative(d.path) || !d.path.startsWith("docs/") || seen.has(d.path) || typeof d.purpose !== "string" || !d.purpose.trim() || !["common", ...(Array.isArray(config.workspaces) ? config.workspaces : [])].includes(d.scope) || (d.depends !== undefined && (!Array.isArray(d.depends) || d.depends.some((p) => !workspace.isRelative(p) || !p.startsWith("docs/"))))) errors.push("invalid scoped document");
+        if (d) seen.add(d.path);
+      }
+      for (const d of config.documents) if (Array.isArray(d?.depends) && d.depends.some((p) => !seen.has(p))) errors.push("unknown document dependency");
+    }
+  }
   return { valid: errors.length === 0, errors };
 }
 
-module.exports = { CORE_FEATURES, DEFAULT_CRITICAL_ACTIONS, parseConfig, validateConfig };
+module.exports = { ...workspace, CORE_FEATURES, DEFAULT_CRITICAL_ACTIONS, parseConfig, validateConfig };

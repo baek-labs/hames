@@ -290,6 +290,10 @@ function renderContract(contract) {
   } else lines.push("- Follow the declared actions in order.");
   lines.push(
     "",
+    "## Handoff",
+    "",
+    "The approved specification takes precedence over the work order and prior conversation. Preserve the listed invariants and output locations. Report scope changes before acting. Git mutations require an explicit user request. Load only the selected workspace and relevant shared documents.",
+    "",
     "## Review and durable knowledge",
     "",
     `- Independent review: ${contract.review?.required ? `Required (${contract.review.reason})` : `Not required${contract.review?.reason ? ` (${contract.review.reason})` : ""}`}`,
@@ -824,11 +828,11 @@ function evaluateEvidence(requirement, input, action, target, existing) {
     passed = requirement.predicate.all_passed === true && items?.length > 0 && items.every((item) => item.status === "passed");
     detail = { reviewer: redactText(String(response.reviewer || "")), items };
   }
-  if (requirement.phase === "action" && !evidencePassedByPhase(existing, action.required_evidence, "before")) passed = false;
-  if (requirement.phase === "after" && (!evidencePassedByPhase(existing, action.required_evidence, "before") || !evidencePassedByPhase(existing, action.required_evidence, "action"))) passed = false;
+  if (target.type !== "file" && requirement.phase === "action" && !evidencePassedByPhase(existing, action.required_evidence, "before")) passed = false;
+  if (target.type !== "file" && requirement.phase === "after" && (!evidencePassedByPhase(existing, action.required_evidence, "before") || !evidencePassedByPhase(existing, action.required_evidence, "action"))) passed = false;
   const actionObservation = Object.values(existing).find((item) => item.action_id === action.id && item.phase === "action");
-  if (requirement.phase === "after" && actionObservation?.resource_id && detail.resource_id !== actionObservation.resource_id) passed = false;
-  if (requirement.phase === "action" && action.kind !== "create") {
+  if (target.type !== "file" && requirement.phase === "after" && actionObservation?.resource_id && detail.resource_id !== actionObservation.resource_id) passed = false;
+  if (target.type !== "file" && requirement.phase === "action" && action.kind !== "create") {
     const before = Object.values(existing).find((item) => item.action_id === action.id && item.phase === "before");
     if (before?.resource_id && detail.resource_id !== before.resource_id) passed = false;
   }
@@ -1057,6 +1061,18 @@ function resolveGoCandidate(root, sessionId) {
 function cli() {
   const args = process.argv.slice(2);
   const command = args.shift();
+  if (!command || command === "--help" || command === "help") return {
+    common: "Every command accepts --root ROOT; task commands use --task ID --session SESSION_ID.",
+    commands: {
+      draft:"--spec SPEC_JSON --session SESSION_ID", present:"--task ID --session SESSION_ID",
+      activate:"--task ID --session SESSION_ID --explicit-go --approve-presented (only after the user's /go)",
+      step:"--task ID --session SESSION_ID --step STEP_ID --status pending|in_progress|completed|failed|blocked",
+      review:"--task ID --session SESSION_ID --result RESULT_JSON", accept:"--task ID --session SESSION_ID --accepted (only after acceptance)",
+      candidate:"--session SESSION_ID", resume:"--task ID --session SESSION_ID",
+      "record-review":"--review REVIEW_JSON", "record-knowledge":"--knowledge KNOWLEDGE_JSON", "confirm-critical":"--action ID --confirmed --impact TEXT"
+    },
+    schema:"schemas/contract.schema.json in the plugin", evidence:"Run the exact approved command. Pre/post hooks bind and capture its result; never synthesize evidence."
+  };
   const options = {};
   for (let index = 0; index < args.length; index += 1) {
     if (args[index].startsWith("--")) {

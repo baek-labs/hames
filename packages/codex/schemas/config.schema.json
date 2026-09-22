@@ -3,51 +3,158 @@
   "$id": "https://github.com/baek-labs/hames/schemas/config.schema.json",
   "title": "Hames project configuration",
   "type": "object",
-  "required": ["version", "project", "workspaces", "tracking", "guards", "features", "extensions"],
+  "required": [
+    "version",
+    "project",
+    "workspaces",
+    "tracking",
+    "guards",
+    "features",
+    "extensions"
+  ],
   "additionalProperties": false,
   "properties": {
-    "version": { "const": 1 },
+    "version": {
+      "enum": [
+        1,
+        2
+      ]
+    },
     "project": {
       "type": "object",
-      "required": ["name", "root"],
+      "required": [
+        "name",
+        "root"
+      ],
       "additionalProperties": false,
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "root": { "const": "." }
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "root": {
+          "const": "."
+        }
       }
     },
     "workspaces": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string", "minLength": 1 },
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
       "uniqueItems": true
     },
     "tracking": {
       "type": "object",
-      "required": ["contracts"],
+      "required": [
+        "contracts"
+      ],
       "additionalProperties": false,
-      "properties": { "contracts": { "enum": ["tracked", "untracked"] } }
+      "properties": {
+        "contracts": {
+          "enum": [
+            "tracked",
+            "untracked"
+          ]
+        }
+      }
     },
     "guards": {
       "type": "object",
-      "required": ["enabled", "critical_actions"],
+      "required": [
+        "enabled",
+        "critical_actions"
+      ],
       "additionalProperties": false,
       "properties": {
-        "enabled": { "const": true },
-        "critical_actions": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+        "enabled": {
+          "const": true
+        },
+        "critical_actions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
       }
     },
     "features": {
       "type": "array",
-      "items": { "enum": ["setup", "ready", "go", "doctor"] },
+      "items": {
+        "enum": [
+          "setup",
+          "ready",
+          "go",
+          "doctor",
+          "index"
+        ]
+      },
       "allOf": [
-        { "contains": { "const": "setup" } },
-        { "contains": { "const": "ready" } },
-        { "contains": { "const": "go" } },
-        { "contains": { "const": "doctor" } }
+        {
+          "contains": {
+            "const": "setup"
+          }
+        },
+        {
+          "contains": {
+            "const": "ready"
+          }
+        },
+        {
+          "contains": {
+            "const": "go"
+          }
+        },
+        {
+          "contains": {
+            "const": "doctor"
+          }
+        }
       ],
       "uniqueItems": true
     },
-    "extensions": { "type": "object", "additionalProperties": { "type": "object" } }
+    "extensions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "purpose",
+          "scope"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "depends": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "exclude": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
   }
 }

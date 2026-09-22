@@ -1,7 +1,7 @@
 {
   "name": "hames",
-  "version": "2.0.0",
-  "description": "A workspace-first harness for approved, evidence-backed agent work",
+  "version": "3.0.0",
+  "description": "A user-shaped AI workspace with built-in execution workflows and automatic file indexes",
   "author": {
     "name": "Baek Labs",
     "url": "https://github.com/baek-labs"
@@ -9,5 +9,11 @@
   "homepage": "https://github.com/baek-labs/hames",
   "repository": "https://github.com/baek-labs/hames",
   "license": "MIT",
-  "keywords": ["agents", "harness", "contracts", "verification"]
+  "keywords": [
+    "agents",
+    "harness",
+    "workspaces",
+    "indexing",
+    "workflow"
+  ]
 }

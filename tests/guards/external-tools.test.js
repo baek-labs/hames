@@ -11,7 +11,7 @@ const { activateContract, approveContract, confirmCriticalAction, createDraft } 
 
 function project() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "hames-external-"));
-  applySetup(planSetup({ root, projectName: "External", contractTracking: "untracked" }), { approved: true });
+  applySetup(planSetup({ root, workspaces: [{ id: "default", path: ".", purpose: "Test workspace" }], projectName: "External", contractTracking: "untracked" }), { approved: true });
   return root;
 }
 

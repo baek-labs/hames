@@ -28,3 +28,6 @@ Thumbs.db
 .vscode/
 *.swp
 *~
+
+# Isolated runtime and host verification
+tests/.tmp/

@@ -1,7 +1,7 @@
 {
   "name": "hames",
-  "version": "2.0.0",
-  "description": "A workspace-first harness for approved, evidence-backed agent work",
+  "version": "3.0.0",
+  "description": "A user-shaped AI workspace with built-in execution workflows and automatic file indexes",
   "author": {
     "name": "Baek Labs",
     "url": "https://github.com/baek-labs"
@@ -9,20 +9,29 @@
   "homepage": "https://github.com/baek-labs/hames",
   "repository": "https://github.com/baek-labs/hames",
   "license": "MIT",
-  "keywords": ["agents", "harness", "contracts", "verification"],
+  "keywords": [
+    "agents",
+    "harness",
+    "workspaces",
+    "indexing",
+    "workflow"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Hames",
-    "shortDescription": "Approve agent work and verify it with evidence.",
-    "longDescription": "Configure a project, approve bounded work, guard execution, and verify completion with observable evidence.",
+    "shortDescription": "Set up your workspace. Let AI follow its rules.",
+    "longDescription": "Choose your folders and rules in a first-use conversation. Hames maintains file indexes, loads relevant context and includes bounded task planning and execution.",
     "developerName": "Baek Labs",
     "category": "Developer Tools",
-    "capabilities": ["Interactive", "Write"],
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
     "websiteURL": "https://github.com/baek-labs/hames",
     "defaultPrompt": [
-      "Set up Hames in this project.",
-      "Prepare this task for approval.",
-      "Check whether Hames is configured correctly."
+      "Help me set up my AI workspace.",
+      "Check my file indexes and folder rules.",
+      "Prepare this task for approval."
     ],
     "brandColor": "#171717"
   }

@@ -22,7 +22,7 @@ const {
 
 function project() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "hames-experience-"));
-  applySetup(planSetup({ root, projectName: "Experience test", contractTracking: "untracked" }), { approved: true });
+  applySetup(planSetup({ root, workspaces: [{ id: "default", path: ".", purpose: "Test workspace" }], projectName: "Experience test", contractTracking: "untracked" }), { approved: true });
   return root;
 }
 
@@ -228,6 +228,6 @@ test("human contract leads with changes, locations, invariants, evidence, and ri
   const root = project();
   createDraft(root, spec(), { sessionId: "session" });
   const markdown = fs.readFileSync(path.join(root, ".hames/contracts/active/improve-flow/contract.md"), "utf8");
-  for (const heading of ["## Changes", "## Deliverable locations", "## Invariants and evidence", "## Work plan", "## Acceptance criteria"]) assert.match(markdown, new RegExp(heading));
+  for (const heading of ["## Changes", "## Deliverable locations", "## Invariants and evidence", "## Work plan", "## Handoff", "## Acceptance criteria"]) assert.match(markdown, new RegExp(heading));
   assert.ok(markdown.indexOf("## Changes") < markdown.indexOf("## Complete specification"));
 });

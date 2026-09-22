@@ -4,7 +4,7 @@
 const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
-const { parseConfig, validateConfig } = require("./config.js");
+const { parseConfig, validateConfig, validateWorkspace } = require("./config.js");
 const { computeSpecHash, normalizeRelative, validateSpec } = require("./contract.js");
 
 function check(id, status, detail) {
@@ -86,7 +86,7 @@ function diagnose(root = process.cwd(), { pluginRoot = path.resolve(__dirname, "
     recovery.push("Repair config.yaml from an approved /setup preview; do not infer missing values.");
   }
 
-  for (const relative of [".hames/workspaces", ".hames/context", ".hames/contracts/active", ".hames/contracts/archive", ".hames/state"]) {
+  for (const relative of [".hames/workspaces", ...(config?.version === 1 ? [".hames/context"] : ["docs"]), ".hames/contracts/active", ".hames/contracts/archive", ".hames/state"]) {
     try {
       safeProjectPath(projectRoot, relative);
       checks.push(check(`path:${relative}`, fs.existsSync(path.join(projectRoot, relative)) ? "pass" : "fail", relative));
@@ -100,7 +100,7 @@ function diagnose(root = process.cwd(), { pluginRoot = path.resolve(__dirname, "
       try {
         if (!/^[a-z0-9][a-z0-9._-]{0,63}$/i.test(workspaceId)) throw new Error("Workspace id is invalid");
         const workspace = parseConfig(fs.readFileSync(workspaceFile, "utf8"));
-        if (workspace.version !== 1 || workspace.id !== workspaceId || typeof workspace.path !== "string") throw new Error("Workspace identity or version is invalid");
+        if (!validateWorkspace(workspace).valid || workspace.id !== workspaceId || typeof workspace.path !== "string") throw new Error("Workspace identity or version is invalid");
         safeProjectPath(projectRoot, workspace.path);
         if (!Array.isArray(workspace.context) || !Array.isArray(workspace.protect)) throw new Error("Workspace context and protect must be arrays");
         for (const item of [...workspace.context, ...workspace.protect]) safeProjectPath(projectRoot, item);
@@ -227,10 +227,10 @@ function diagnose(root = process.cwd(), { pluginRoot = path.resolve(__dirname, "
     }
   }
 
-  for (const name of ["setup", "ready", "go", "doctor"]) {
+  for (const name of ["setup", "ready", "go", "index", "doctor"]) {
     checks.push(check(`skill:${name}`, fs.existsSync(path.join(skillsRoot, name, "SKILL.md")) ? "pass" : "fail", name));
   }
-  for (const name of ["scope-guard.js", "evidence-guard.js", "context-loader.js"]) {
+  for (const name of ["scope-guard.js", "evidence-guard.js", "context-loader.js", "index-sync.js"]) {
     checks.push(check(`hook:${name}`, fs.existsSync(path.join(hooksRoot, name)) ? "pass" : "fail", name));
   }
   for (const name of ["config.schema.json", "contract.schema.json"]) {
@@ -250,6 +250,8 @@ function diagnose(root = process.cwd(), { pluginRoot = path.resolve(__dirname, "
       const expectedCommand = `node "\${CLAUDE_PLUGIN_ROOT}/hooks/${script}"`;
       if (!handlers.some((handler) => handler.type === "command" && handler.command === expectedCommand && Number.isFinite(handler.timeout) && handler.timeout > 0)) throw new Error(`${event} does not safely invoke ${script}`);
     }
+    const postHandlers = hooks.hooks?.PostToolUse?.flatMap(group => group.hooks || []) || [];
+    if (!postHandlers.some(handler => handler.command === 'node "${CLAUDE_PLUGIN_ROOT}/hooks/index-sync.js"')) throw new Error("PostToolUse index-sync is not connected");
     checks.push(check("hook:hooks.json", "pass", "Required lifecycle handlers are connected."));
   } catch (error) {
     checks.push(check("hook:hooks.json", "fail", error.message));
@@ -268,6 +270,19 @@ function diagnose(root = process.cwd(), { pluginRoot = path.resolve(__dirname, "
   } catch (error) {
     checks.push(check("plugin-manifest", "fail", error.message));
   }
+  for (const relative of [".hames/state/index-pending.json", ".hames/state/index.lock"]) {
+    try {const file=safeProjectPath(projectRoot,relative);const exists=fs.existsSync(file);checks.push(check(relative,exists?"warn":"pass",exists?"Index work needs recovery or another writer is active.":"No pending marker."));}
+    catch(error){checks.push(check(relative,"fail",error.message));}
+  }
+  try {
+    const queue=safeProjectPath(projectRoot,".hames/state/index-queue");
+    const count=fs.existsSync(queue)?fs.readdirSync(queue).filter(n=>n.endsWith(".json")).length:0;
+    checks.push(check("index-queue",count?"warn":"pass",`${count} deferred index updates.`));
+    const file=safeProjectPath(projectRoot,".hames/state/hook-observations.json");
+    if(fs.existsSync(file)){const observed=JSON.parse(fs.readFileSync(file,"utf8"));checks.push(check("hook-observed",observed.index_ok?"pass":"warn",`Observed ${observed.event} at ${observed.observed_at}; index success: ${observed.index_ok}. This is a local observation, not host trust proof.`));}
+    else checks.push(check("hook-observed","warn","No file-hook run has been observed in this root. Installing or configuring hooks does not prove execution."));
+    checks.push(check("hook-trust","warn","Host trust is not verified by this project diagnostic; check the host's hook permission state."));
+  }catch(error){checks.push(check("hook-observed","fail",error.message));}
   checks.push(check("contract-tracking", config ? "pass" : "warn", config?.tracking?.contracts || "Unknown while config is invalid."));
   return { ok: checks.every((item) => item.status !== "fail"), project_root: projectRoot, checks, recovery };
 }

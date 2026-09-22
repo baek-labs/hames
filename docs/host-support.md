@@ -1,17 +1,12 @@
 # Host support
 
-Codex and Claude Code are the first supported Hames hosts. Both packages contain the same four skills, runtime, schemas, templates, and hook logic. Only manifest placement and host metadata differ.
+Codex and Claude Code receive the same five skills and shared runtime in generated packages. Host manifest locations differ. Node.js must be available to execute the bundled hooks; ordinary Hames work needs no Git.
 
-## Codex
+Use a fresh session after installing or updating a package. The startup hook can invite first-use setup; if hooks are unavailable or untrusted, `/setup` starts the same conversation explicitly. Do not treat manifest discovery as proof that hooks ran.
 
-The generated package uses `.codex-plugin/plugin.json`, `skills/`, and the default `hooks/hooks.json` discovery location. Codex requires non-managed plugin hooks to be reviewed and trusted; installing a plugin alone does not prove that its hooks ran.
+- Codex: `.codex-plugin/plugin.json`, `skills/`, and `hooks/hooks.json`. The host reports apply_patch arguments in `tool_input.command` and post-tool output in `tool_response`. Plugin hook trust belongs to the host.
+- Claude Code: `.claude-plugin/plugin.json`, `skills/`, and `hooks/hooks.json`. `--plugin-dir` can load the package for a test session without installing it globally.
 
-## Claude Code
+[Official Codex hook reference](https://learn.chatgpt.com/docs/hooks) describes tool coverage and trust separately. Hames diagnostics report wiring, local observations and unverified trust independently. Neither shell nor unstructured UI enforcement is a complete security sandbox.
 
-The generated package uses `.claude-plugin/plugin.json`, `skills/`, and `hooks/hooks.json`. Hook commands use `CLAUDE_PLUGIN_ROOT`; Codex also supplies this variable for Claude compatibility.
-
-## Current limits
-
-Grok Build, Gemini CLI, Antigravity, Cursor, and other hosts are not officially supported. A host reading some Claude-compatible files is not sufficient evidence of compatibility. Each future host needs manifest discovery, skill discovery, hook lifecycle, blocking output, session identity, and representative workflow tests.
-
-Automated package tests do not replace a fresh-session host test. Before release, verify that `/setup`, `/ready`, `/go`, and `/doctor` are discoverable in new Codex and Claude Code sessions. Confirm that a same-session `/go` activates the contract just shown without another approval, dependency progress resumes, required review blocks completion, and representative file and mock external-service flows reach the expected hook and state transitions.
+Other hosts are not officially supported. Actual tested versions, operating system, result artifacts and any blocked checks are recorded in [verification](verification.md). Do not infer Windows or Linux validation from portable path code alone.

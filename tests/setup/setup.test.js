@@ -14,9 +14,11 @@ function project({ git = true } = {}) {
   return root;
 }
 
+const TEST_WORKSPACE = { id: "default", path: ".", name: "Project", purpose: "Test workspace", folders: [], rules: [], exclude: [], context: [], protect: [] };
+
 test("setup previews a new Git project and writes only after approval", () => {
   const root = project();
-  const plan = planSetup({ root, projectName: "Example", contractTracking: "tracked" });
+  const plan = planSetup({ root, projectName: "Example", contractTracking: "tracked", workspaces: [TEST_WORKSPACE] });
   assert.equal(plan.status, "ready");
   assert.equal(plan.git, true);
   assert.ok(plan.operations.some((item) => item.path === ".hames/config.yaml"));
@@ -43,7 +45,7 @@ test("setup preserves existing entry documents and is idempotent", () => {
   const root = project();
   fs.writeFileSync(path.join(root, "AGENTS.md"), "# Existing agents\n\nKeep this.\n");
   fs.writeFileSync(path.join(root, "CLAUDE.md"), "# Existing Claude rules\n");
-  const first = planSetup({ root, projectName: "Existing", contractTracking: "untracked" });
+  const first = planSetup({ root, projectName: "Existing", contractTracking: "untracked", workspaces: [TEST_WORKSPACE] });
   applySetup(first, { approved: true });
 
   const agents = fs.readFileSync(path.join(root, "AGENTS.md"), "utf8");
@@ -69,7 +71,7 @@ test("setup preserves existing entry documents and is idempotent", () => {
 
 test("setup supports non-Git projects without creating .gitignore", () => {
   const root = project({ git: false });
-  const plan = planSetup({ root, projectName: "Notes", contractTracking: "untracked" });
+  const plan = planSetup({ root, projectName: "Notes", contractTracking: "untracked", workspaces: [TEST_WORKSPACE] });
   assert.equal(plan.git, false);
   assert.equal(plan.operations.some((item) => item.path === ".gitignore"), false);
   applySetup(plan, { approved: true });
@@ -78,7 +80,7 @@ test("setup supports non-Git projects without creating .gitignore", () => {
 
 test("setup asks for contract tracking and does not guess", () => {
   const root = project();
-  const plan = planSetup({ root, projectName: "Choice" });
+  const plan = planSetup({ root, projectName: "Choice", workspaces: [TEST_WORKSPACE] });
   assert.equal(plan.status, "needs_input");
   assert.deepEqual(plan.questions.map((item) => item.id), ["contract_tracking"]);
   assert.equal(plan.operations.length, 0);
@@ -98,7 +100,7 @@ test("setup reports damaged config without overwriting it", () => {
 test("a failed apply rolls back file changes and leaves no success marker", () => {
   const root = project();
   fs.writeFileSync(path.join(root, "AGENTS.md"), "# Keep me\n");
-  const plan = planSetup({ root, projectName: "Rollback", contractTracking: "tracked" });
+  const plan = planSetup({ root, projectName: "Rollback", contractTracking: "tracked", workspaces: [TEST_WORKSPACE] });
   assert.throws(
     () => applySetup(plan, { approved: true, failAfter: 3 }),
     /Simulated setup failure/,
@@ -106,35 +108,35 @@ test("a failed apply rolls back file changes and leaves no success marker", () =
   assert.equal(fs.readFileSync(path.join(root, "AGENTS.md"), "utf8"), "# Keep me\n");
   assert.equal(fs.existsSync(path.join(root, ".hames/state/setup-complete.json")), false);
 
-  const retry = planSetup({ root, projectName: "Rollback", contractTracking: "tracked" });
+  const retry = planSetup({ root, projectName: "Rollback", contractTracking: "tracked", workspaces: [TEST_WORKSPACE] });
   assert.equal(retry.status, "ready");
 });
 
 test("setup preserves project-owned context and updates only managed boundary blocks", () => {
   const root = project();
-  applySetup(planSetup({ root, projectName: "Managed", contractTracking: "tracked" }), { approved: true });
-  fs.writeFileSync(path.join(root, ".hames/context/project.md"), "# Durable user decision\n");
+  applySetup(planSetup({ root, projectName: "Managed", contractTracking: "tracked", workspaces: [TEST_WORKSPACE] }), { approved: true });
+  fs.writeFileSync(path.join(root, "docs/standards.md"), "# Durable user decision\n");
   const agentsFile = path.join(root, "AGENTS.md");
   const agents = fs.readFileSync(agentsFile, "utf8");
-  fs.writeFileSync(agentsFile, `User preface\n\n${agents.replace("use `/ready`", "use old instructions")}\nUser suffix\n`);
+  fs.writeFileSync(agentsFile, `User preface\n\n${agents.replace("Review bounded work", "use old instructions")}\nUser suffix\n`);
   fs.chmodSync(agentsFile, 0o640);
 
   const plan = planSetup({ root, projectName: "Managed", contractTracking: "tracked" });
-  assert.equal(plan.operations.some((item) => item.path === ".hames/context/project.md"), false);
+  assert.equal(plan.operations.some((item) => item.path === "docs/standards.md"), false);
   const entry = plan.operations.find((item) => item.path === "AGENTS.md");
   assert.equal(entry.type, "update");
   assert.match(entry.after, /^User preface/);
   assert.match(entry.after, /User suffix/);
   assert.doesNotMatch(entry.after, /old instructions/);
   applySetup(plan, { approved: true });
-  assert.equal(fs.readFileSync(path.join(root, ".hames/context/project.md"), "utf8"), "# Durable user decision\n");
+  assert.equal(fs.readFileSync(path.join(root, "docs/standards.md"), "utf8"), "# Durable user decision\n");
   if (process.platform !== "win32") assert.equal(fs.statSync(agentsFile).mode & 0o777, 0o640);
 });
 
 test("interrupted setup recovery rolls back only journaled operations", () => {
   const root = project();
   fs.writeFileSync(path.join(root, "AGENTS.md"), "Before\n");
-  const plan = planSetup({ root, projectName: "Recovery", contractTracking: "tracked" });
+  const plan = planSetup({ root, projectName: "Recovery", contractTracking: "tracked", workspaces: [TEST_WORKSPACE] });
   const agentIndex = plan.operations.findIndex((item) => item.path === "AGENTS.md");
   fs.writeFileSync(path.join(root, "AGENTS.md"), plan.operations[agentIndex].after);
   fs.mkdirSync(path.join(root, ".hames/state"), { recursive: true });
@@ -155,9 +157,9 @@ test("interrupted setup recovery rolls back only journaled operations", () => {
 
 test("configuration cannot remove built-in critical actions", () => {
   const root = project();
-  applySetup(planSetup({ root, projectName: "Critical", contractTracking: "tracked" }), { approved: true });
+  applySetup(planSetup({ root, projectName: "Critical", contractTracking: "tracked", workspaces: [TEST_WORKSPACE] }), { approved: true });
   const file = path.join(root, ".hames/config.yaml");
-  const weakened = fs.readFileSync(file, "utf8").replace('"delete", ', "");
+  const weakened = fs.readFileSync(file, "utf8").replace(/"delete",\s*/, "");
   const parsed = parseConfig(weakened);
   assert.equal(validateConfig(parsed).valid, false);
   assert.match(validateConfig(parsed).errors.join("; "), /cannot remove/);
@@ -165,14 +167,14 @@ test("configuration cannot remove built-in critical actions", () => {
 
 test("setup refuses a plan changed after preview", () => {
   const root = project();
-  const plan = planSetup({ root, projectName: "Tamper", contractTracking: "tracked" });
+  const plan = planSetup({ root, projectName: "Tamper", contractTracking: "tracked", workspaces: [TEST_WORKSPACE] });
   plan.operations[0].path = "../outside";
   assert.throws(() => applySetup(plan, { approved: true }), /plan.*changed|hash/i);
 });
 
 test("configured projects reuse their tracking choice and preview explicit changes", () => {
   const root = project();
-  applySetup(planSetup({ root, projectName: "Choice", contractTracking: "tracked" }), { approved: true });
+  applySetup(planSetup({ root, projectName: "Choice", contractTracking: "tracked", workspaces: [TEST_WORKSPACE] }), { approved: true });
   const repeated = planSetup({ root, projectName: "Choice" });
   assert.equal(repeated.status, "configured");
   assert.equal(repeated.contractTracking, "tracked");
@@ -190,12 +192,14 @@ test("configured projects reuse their tracking choice and preview explicit chang
 test("setup CLI requires the exact preview hash before apply", () => {
   const root = project({ git: false });
   const runtime = path.resolve(__dirname, "../../src/runtime/setup.js");
-  const base = [runtime, "apply", "--root", root, "--project-name", "CLI", "--contracts", "tracked", "--approved"];
+  const input = path.join(root,"decisions.json");
+  fs.writeFileSync(input, JSON.stringify({workspaces:[TEST_WORKSPACE]}));
+  const base = [runtime, "apply", "--input", input, "--root", root, "--project-name", "CLI", "--contracts", "tracked", "--approved"];
   const missing = spawnSync(process.execPath, base, { encoding: "utf8" });
   assert.notEqual(missing.status, 0);
   assert.equal(fs.existsSync(path.join(root, ".hames")), false);
 
-  const preview = spawnSync(process.execPath, [runtime, "plan", "--root", root, "--project-name", "CLI", "--contracts", "tracked"], { encoding: "utf8" });
+  const preview = spawnSync(process.execPath, [runtime, "plan", "--input", input, "--root", root, "--project-name", "CLI", "--contracts", "tracked"], { encoding: "utf8" });
   assert.equal(preview.status, 0, preview.stderr);
   const hash = JSON.parse(preview.stdout).plan_hash;
   const applied = spawnSync(process.execPath, [...base, "--plan-hash", hash], { encoding: "utf8" });
@@ -206,7 +210,7 @@ test("setup CLI requires the exact preview hash before apply", () => {
 test("setup refuses stale previews instead of overwriting newer project edits", () => {
   const root = project();
   fs.writeFileSync(path.join(root, "AGENTS.md"), "Original\n");
-  const plan = planSetup({ root, projectName: "Stale", contractTracking: "tracked" });
+  const plan = planSetup({ root, projectName: "Stale", contractTracking: "tracked", workspaces: [TEST_WORKSPACE] });
   fs.writeFileSync(path.join(root, "AGENTS.md"), "Newer user edit\n");
   assert.throws(() => applySetup(plan, { approved: true }), /project changed|stale/i);
   assert.equal(fs.readFileSync(path.join(root, "AGENTS.md"), "utf8"), "Newer user edit\n");
@@ -222,7 +226,7 @@ test("setup rejects a .hames symlink that leaves the project", () => {
 
 test("setup rejects a nested managed-directory symlink that leaves the project", () => {
   const root = project();
-  applySetup(planSetup({ root, projectName: "Nested", contractTracking: "tracked" }), { approved: true });
+  applySetup(planSetup({ root, projectName: "Nested", contractTracking: "tracked", workspaces: [TEST_WORKSPACE] }), { approved: true });
   const outside = fs.mkdtempSync(path.join(os.tmpdir(), "hames-setup-nested-"));
   fs.renameSync(path.join(root, ".hames/workspaces"), path.join(root, ".hames/workspaces-old"));
   fs.symlinkSync(outside, path.join(root, ".hames/workspaces"));
@@ -245,4 +249,110 @@ test("recovery rejects injected paths and never changes an outside file", () => 
   assert.equal(preview.valid, false);
   assert.throws(() => recoverSetup(root, { approved: true, recoveryHash: preview.recovery_hash }), /invalid|outside|hash/i);
   assert.equal(fs.readFileSync(outside, "utf8"), "Keep\n");
+});
+
+test("first setup asks for workspace roles instead of inventing a default workspace", () => {
+  const root = project({ git: false });
+  const plan = planSetup({ root, projectName: "Chosen", });
+  assert.equal(plan.status, "needs_input");
+  assert.equal(plan.contractTracking, "untracked");
+  assert.equal(plan.operations.length, 0);
+  assert.ok(plan.questions.some((question) => question.id === "workspace"));
+  assert.equal(fs.existsSync(path.join(root, ".hames")), false);
+});
+
+test("setup uses the supplied workspace composition and previews indexes before approval", () => {
+  const root = project({ git: false });
+  const plan = planSetup({
+    root,
+    projectName: "Chosen",
+    workspaceDecisions: [{
+      id: "research",
+      path: "학습 자료",
+      name: "학습 자료",
+      purpose: "Research notes",
+      folders: [{ path: "회의록", purpose: "Meeting notes" }],
+      rules: [{ id: "markdown", kind: "extension", path: "회의록", value: [".md"] }],
+      exclude: [],
+      context: [],
+      protect: [],
+    }],
+  });
+  assert.equal(plan.status, "ready");
+  assert.equal(plan.contractTracking, "untracked");
+  assert.equal(plan.config.version, 2);
+  assert.ok(plan.operations.some((operation) => operation.path === "학습 자료" && operation.type === "mkdir"));
+  assert.ok(plan.operations.some((operation) => operation.path === "학습 자료/회의록" && operation.type === "mkdir"));
+  assert.ok(plan.operations.some((operation) => operation.path === "_Index.md"));
+  assert.ok(plan.operations.some((operation) => operation.path === "학습 자료/_Index.md"));
+  assert.equal(fs.existsSync(path.join(root, ".hames")), false);
+
+  applySetup(plan, { approved: true });
+  const config = parseConfig(fs.readFileSync(path.join(root, ".hames/config.yaml"), "utf8"));
+  assert.equal(config.version, 2);
+  assert.deepEqual(config.workspaces, ["research"]);
+  const workspace = parseConfig(fs.readFileSync(path.join(root, ".hames/workspaces/research.yaml"), "utf8"));
+  assert.equal(workspace.path, "학습 자료");
+  assert.deepEqual(workspace.folders, [{ path: "회의록", purpose: "Meeting notes" }]);
+  assert.equal(fs.existsSync(path.join(root, "학습 자료/_Index.md")), true);
+  assert.equal(fs.existsSync(path.join(root, "docs/_Index.md")), true);
+});
+
+test("non-Git setup retains archived records and blocks active v1 contracts during upgrade", () => {
+  const root = project({ git: false });
+  fs.mkdirSync(path.join(root, ".hames/contracts/active/old"), { recursive: true });
+  fs.mkdirSync(path.join(root, ".hames/contracts/archive"), { recursive: true });
+  fs.writeFileSync(path.join(root, ".hames/contracts/active/old/plan.md"), "in progress\n");
+  fs.writeFileSync(path.join(root, ".hames/contracts/archive/accepted.md"), "keep\n");
+  fs.mkdirSync(path.join(root, ".hames/workspaces"), { recursive: true });
+  fs.writeFileSync(path.join(root, ".hames/config.yaml"), [
+    "version: 1",
+    "project:",
+    "  name: Old",
+    "  root: \".\"",
+    "workspaces: [\"default\"]",
+    "tracking:",
+    "  contracts: untracked",
+    "guards:",
+    "  enabled: true",
+    "  critical_actions: [\"delete\", \"destructive_overwrite\", \"send\", \"publish\", \"deploy\", \"payment\", \"permission_change\", \"external_mutation\"]",
+    "features: [\"setup\", \"ready\", \"go\", \"doctor\"]",
+    "extensions: {}",
+    "",
+  ].join("\n"));
+  fs.writeFileSync(path.join(root, ".hames/workspaces/default.yaml"), [
+    "version: 1",
+    "id: default",
+    "path: .",
+    "context: [\"docs/standards.md\"]",
+    "protect: [\".hames/config.yaml\", \".hames/workspaces/default.yaml\"]",
+    "",
+  ].join("\n"));
+  const blocked = planSetup({ root, projectName: "Old" });
+  assert.equal(blocked.status, "legacy_active_contracts");
+  assert.equal(blocked.operations.length, 0);
+  assert.equal(fs.readFileSync(path.join(root, ".hames/contracts/archive/accepted.md"), "utf8"), "keep\n");
+
+  fs.rmSync(path.join(root, ".hames/contracts/active/old"), { recursive: true });
+  const inherited = planSetup({ root });
+  assert.equal(inherited.status, "ready");
+  assert.equal(inherited.config.version, 2);
+  const plan = planSetup({
+    root,
+    workspaceDecisions: [{ id: "default", path: ".", name: "Root", purpose: "General work", folders: [], rules: [], exclude: [], context: [], protect: [] }],
+  });
+  assert.equal(plan.status, "ready");
+  assert.equal(plan.config.version, 2);
+  assert.equal(plan.operations.some((operation) => operation.path === ".hames/contracts/archive/accepted.md"), false);
+  applySetup(plan, { approved: true });
+  assert.equal(parseConfig(fs.readFileSync(path.join(root, ".hames/config.yaml"), "utf8")).version, 2);
+  assert.equal(fs.readFileSync(path.join(root, ".hames/contracts/archive/accepted.md"), "utf8"), "keep\n");
+});
+
+test("duplicate managed entry markers stop setup without altering user text", () => {
+  const root=project({git:false});
+  const original="<!-- HAMES:START -->\nA\n<!-- HAMES:END -->\n<!-- HAMES:START -->\nB\n<!-- HAMES:END -->\n";
+  fs.writeFileSync(path.join(root,"AGENTS.md"),original);
+  assert.throws(()=>planSetup({root,workspaces:[TEST_WORKSPACE]}),/duplicate|marker/i);
+  assert.equal(fs.readFileSync(path.join(root,"AGENTS.md"),"utf8"),original);
 });

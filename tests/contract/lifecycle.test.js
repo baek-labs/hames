@@ -23,7 +23,7 @@ const {
 
 function project() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "hames-contract-"));
-  applySetup(planSetup({ root, projectName: "Contract test", contractTracking: "untracked" }), { approved: true });
+  applySetup(planSetup({ root, workspaces: [{ id: "default", path: ".", purpose: "Test workspace" }], projectName: "Contract test", contractTracking: "untracked" }), { approved: true });
   return root;
 }
 

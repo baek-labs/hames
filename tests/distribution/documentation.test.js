@@ -9,13 +9,14 @@ function read(relative) {
   return fs.readFileSync(path.join(ROOT, relative), "utf8");
 }
 
-test("README explains installation, setup, four commands, hosts, and boundaries", () => {
+test("README explains installation, setup, five commands, hosts, and boundaries", () => {
   const readme = read("README.md");
   assert.match(readme, /install(?:ing|ation).*plugin/is);
   assert.match(readme, /\/setup/);
   assert.match(readme, /\/ready/);
   assert.match(readme, /\/go/);
   assert.match(readme, /\/doctor/);
+  assert.match(readme, /\/index/);
   assert.match(readme, /Codex.*Claude Code/is);
   assert.match(readme, /code.*document.*browser.*external service/is);
   assert.doesNotMatch(readme, /Hames v2/i);

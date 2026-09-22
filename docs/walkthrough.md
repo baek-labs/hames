@@ -1,51 +1,13 @@
-# Hames 개편 작업 기록
+# Walkthrough
 
-## 현재 계약 사용 흐름
+Install Hames, review its hooks and open the chosen AI work root in a fresh session. If automatic first-use guidance does not appear, invoke `/setup`.
 
-1. `/ready`는 목표·범위·산출물 위치·작업 순서·검토 기준·완료 기준을 사람이 읽을 수 있게 보여준다.
-2. 같은 대화의 `/go` 한 번이 방금 제시한 정확한 계약의 승인과 실행 요청이다. 작업 ID나 별도 승인 문구를 반복하지 않는다.
-3. `/go`는 선행 작업을 지키고 진행 상태를 남긴다. 같은 세션은 그 상태에서 재개하며, 다른 세션은 안전한 인계 확인이 필요하다.
-4. 동작 변경·외부 작업·복잡한 산출물은 독립 검토를 한 번 거친다. 단순 수정은 직접 검증한다.
-5. 장기 지식은 계약에서 승인한 프로젝트 문서에만 반영한다. 새 범위는 쓰기 전에 제안한다.
+Tell the agent which workspaces you want and what each folder should contain. It offers a tree and concrete rules, then shows the exact change preview. Approval applies that preview once and creates the folder indexes. A second setup with the same choices changes nothing.
 
-자동 테스트는 이 상태 전환을 검증한다. 실제 호스트 발견·대화·훅 작동 여부는 아래의 호스트 검증 기록과 분리한다.
+Ask for a document in a selected workspace. The agent reads common rules and the relevant workspace/document context, follows placement and naming rules, and creates the file. A successful structured file event updates the index. If the tool failed or a lock prevented maintenance, the agent reports the incomplete index and preserves your file.
 
-### 2026-09-09 검증
+Invoke `/index` to audit all managed folders, or name one workspace. Missing entries, broken links, rule violations and judgment gaps are reported separately. Ask to repair chosen index changes and review that preview; the audit itself never repairs.
 
-| 항목 | 이전 계약 | 현재 계약 | 관측 방법 |
-|---|---:|---:|---|
-| 같은 세션에서 계약 제시 후 일반 실행 전 추가 확인 | 별도 승인과 단일 후보 확인 | 0회 | 동일 런타임 시나리오 테스트 |
-| 중요 작업 직전 확인 | 1회 | 1회 | 기존 중요 작업 테스트 유지 |
-| 최종 결과 수락 | 1회 | 1회 | 기존 수락·보관 테스트 유지 |
+For a bounded larger task, `/ready` presents requirements, locations, work order, verification and handoff in one contract. `/go` in that conversation approves its exact revision and executes it. Review the evidence and accept the result to archive the contract. No Git operation is implied.
 
-- `node --test`는 84개 테스트를 통과했다. 새 시나리오는 같은 세션의 제시→`/go`, 다른 세션의 확인 후 실행, 작업 선행 관계, 같은 세션 재개, 안전한 세션 인계, 검토와 현재 증거·산출물의 결속, 3회 반복 실패 중단, 장기 지식 결과, stale lock 복구와 중복 세션 소유자 차단을 포함한다.
-- Claude Code 2.1.263의 새 `--plugin-dir` 세션에서 네 Core 스킬이 발견됐고, 갱신된 `/ready`·`/go` 설명이 같은 세션 승인 규칙을 전달했다.
-- Claude Code의 읽기 전용 `/setup` 미리보기는 임시 프로젝트의 기존 `AGENTS.md`와 일반 파일을 변경하지 않았다. Claude의 plan 모드는 프로젝트 밖 사용자 plan 파일을 생성했으므로 완전한 무상태 호스트 검증으로 보지 않는다.
-- Codex CLI 0.153.3은 로컬 `baek-labs` marketplace와 새 패키지 경로를 읽었지만 Hames는 설치되지 않은 상태였다. 공식 테스트 절차가 ChatGPT 데스크톱 앱에서의 로컬 설치를 요구하므로 사용자 전역 설치 상태를 바꾸지 않고 실제 Codex 새 세션 시험은 수행하지 않았다.
-- 모의 외부 서비스 테스트는 계약 대상·행위·전후 증거와 중요 작업 확인을 검사한다. 실제 외부 전달 성공을 의미하지 않는다.
-
-## 변경 내용
-
-- 저장소 복제형 개인 운영체제 구조를 설치형 Hames 플러그인 구조로 교체했다.
-- `src/`를 유일한 편집 정본으로 두고 Codex·Claude Code 패키지를 빌드로 생성하도록 했다.
-- Core 명령을 `/setup`, `/ready`, `/go`, `/doctor` 네 개로 제한했다.
-- 프로젝트 설정 미리보기와 승인 해시, 재실행 안전성, 실패 복구 기록을 구현했다.
-- 파일·문서·레코드·웹·외부 서비스 계약, 상태 전환, 명세 해시, 세션 분리, 안전한 증거 메타데이터를 구현했다.
-- 경로 이탈·심볼릭 링크·계약 변조·증거 누락·별도 확인 없는 중요 작업을 검사하는 훅을 추가했다.
-- 고정 사용자, 고정 작업 공간, 고정 역할, 개인 도구, 호스트별 수동 사본, Cockpit 연결을 제거했다.
-- 최초 공개 커밋부터 재설계 직전 커밋까지의 정적 manifest로 구형 공개 Hames를 판별하고, 원본 시스템 파일만 정리하는 같은 폴더 전환을 추가했다.
-
-## 테스트 결과
-
-- `node --test`: 자동화된 setup, contract, guard, distribution, documentation 검증을 실행한다.
-- `node scripts/build.mjs`: 두 생성 패키지를 정본에서 다시 만든다.
-- `node scripts/verify.mjs`: manifest·schema·hook·정본 일치·Core 명령 수·하드코딩 경계를 검사한다.
-- Codex 패키지는 `scripts/verify.mjs`의 manifest·구조 검증을 통과했다.
-- Claude Code 패키지와 marketplace는 Claude CLI validator를 통과했다.
-
-## 확인 근거와 제한
-
-- Claude Code의 일회성 `--plugin-dir` 로드에서 네 스킬과 세 훅이 발견됐고, 새 print 세션에서 네 Core 명령을 인식했다.
-- Codex CLI에는 전역 설정을 바꾸지 않는 일회성 로컬 플러그인 주입 경로가 확인되지 않았다. 패키지 검증은 통과했지만, 실제 Codex 새 세션 시험은 사용자 승인 후 로컬 marketplace 설치로 별도 확인해야 한다.
-- 공개 저장소에는 GitHub Actions workflow를 포함하지 않는다. 자동 검증은 로컬 release check로 제공한다.
-- 훅의 구조화된 파일·도구 입력은 기계 검사하지만, 셸 문자열과 구조화되지 않은 브라우저·UI 작업은 완전한 격리 환경이 아니라 best-effort 경계다.
+Use `/doctor` when setup, plugin wiring, pending maintenance or contract state needs diagnosis. Shared long-lived docs stay at the AI work root and are loaded selectively.
